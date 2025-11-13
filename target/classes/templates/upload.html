@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Upload Excel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    h2, h3 {
+      color: #333;
+    }
+    .btn {
+      display: inline-block;
+      padding: 8px 14px;
+      margin: 4px;
+      text-decoration: none;
+      background-color: #1976d2;
+      color: white;
+      border-radius: 4px;
+      transition: 0.2s;
+    }
+    .btn:hover {
+      background-color: #0f5ba6;
+    }
+    .btn-secondary {
+      background-color: #555;
+    }
+    .btn-secondary:hover {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+<div class="download-template">
+  <h3>Tải file Excel mẫu</h3>
+  <a href="/download-template" class="btn btn-secondary">Tải xuống file mẫu (.xlsx)</a>
+</div>
+
+<div class="download-doc-template">
+  <h3>Tải file .doc mẫu</h3>
+  <a href="/download-doc-template" class="btn btn-secondary">Tải xuống file mẫu (.doc)</a>
+</div>
+
+<hr>
+
+<h2>Upload file .xlsx để tạo file .doc</h2>
+<form method="post" enctype="multipart/form-data" th:action="@{/upload}">
+  <input type="file" name="file" accept=".xlsx"/>
+  <button type="submit" class="btn">Upload</button>
+</form>
+
+<div th:if="${error}">
+  <p style="color:red" th:text="${error}"></p>
+</div>
+
+<div th:if="${files}">
+  <h3>Danh sách file đã tạo:</h3>
+  <ul>
+    <li th:each="f : ${files}">
+      <a th:href="@{'/download/' + ${f}}" th:text="${f}" class="btn btn-secondary"></a>
+    </li>
+  </ul>
+</div>
+
+<div th:if="${latestDoc}">
+  <h3>Tải xuống file .doc mới nhất:</h3>
+  <a th:href="@{'/download/' + ${latestDoc}}" class="btn">Tải xuống file .doc</a>
+</div>
+</body>
+</html>
