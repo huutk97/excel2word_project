@@ -1,0 +1,90 @@
+#############################
+# Maven
+#############################
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+.mvn/timing.properties
+
+#############################
+# Build output
+#############################
+build/
+out/
+
+#############################
+# IntelliJ
+#############################
+.idea/
+*.iml
+*.iws
+*.ipr
+
+#############################
+# Eclipse
+#############################
+.project
+.classpath
+.settings/
+bin/
+
+#############################
+# VS Code
+#############################
+.vscode/
+
+#############################
+# OS Files
+#############################
+.DS_Store
+Thumbs.db
+
+#############################
+# Logs
+#############################
+*.log
+logs/
+log/
+*.log.*
+
+#############################
+# Java files
+#############################
+*.class
+*.jar
+*.war
+*.ear
+
+#############################
+# Spring Boot Specific
+#############################
+application-prod.properties
+application-dev.properties
+application-local.properties
+application-test.properties
+*.env
+.env
+.env.*
+
+#############################
+# Security / Credentials
+#############################
+*.key
+*.pem
+*.p12
+*.keystore
+
+#############################
+# Docker
+#############################
+docker-data/
+docker-volume/
+
+#############################
+# Node / Frontend (nếu có)
+#############################
+node_modules/
+dist/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
