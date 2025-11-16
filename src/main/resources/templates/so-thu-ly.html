@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sổ Thụ Lý</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
+    <style>
+        .content-note {
+            font-size: 12px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+<h2>Danh sách sổ thụ lý</h2>
+
+<!-- ======================= TÌM KIẾM ======================= -->
+<div class="d-flex gap-3 mb-3 align-items-end">
+
+    <button class="btn btn-info gap-2" onclick="searchData()">
+        <i class="fa fa-search"></i> Tìm
+    </button>
+
+    <div>
+        <label class="form-label mb-0">Từ ngày</label>
+        <input id="searchFrom" class="form-control" style="width:150px;" placeholder="dd-MM-yyyy">
+    </div>
+
+    <div>
+        <label class="form-label mb-0">Đến ngày</label>
+        <input id="searchTo" class="form-control" style="width:150px;" placeholder="dd-MM-yyyy">
+    </div>
+
+    <div class="d-flex gap-2 ms-auto">
+        <button class="btn btn-primary" onclick="openCreateModal()">+ Thêm mới</button>
+        <button class="btn btn-success" onclick="exportExcel()">Export Excel</button>
+    </div>
+
+</div>
+
+<!-- ======================= TABLE ======================= -->
+<table class="table table-bordered table-striped table-sm">
+    <thead class="table-cell">
+    <tr>
+        <th rowspan="2" class="text-center align-middle">#</th>
+        <th rowspan="2" class="text-center align-middle">Ngày TL</th>
+        <th rowspan="2" class="text-center align-middle">Bản án, Quyết định<br><span class="content-note">(Số; Ngày; Tháng; Năm)</span></th>
+        <th rowspan="2" class="text-center align-middle">Người phải thi hành</th>
+        <th rowspan="2" class="text-center align-middle">Người được thi hành</th>
+        <th rowspan="2" class="text-center align-middle">QĐ Ủy thác đi</th>
+        <th rowspan="2" class="text-center align-middle">QĐ Ủy thác đến</th>
+        <th rowspan="2" class="text-center align-middle">QĐ THA dân sự</th>
+        <th rowspan="2" class="text-center align-middle">Không đủ điều kiện</th>
+        <th rowspan="2" class="text-center align-middle">Rút THA</th>
+        <th colspan="2" class="text-center align-middle">Hoãn THA</th>
+        <th colspan="2" class="text-center align-middle">Tạm đình chỉ THA</th>
+        <th rowspan="2" class="text-center align-middle">Đình chỉ</th>
+        <th rowspan="2" class="text-center align-middle">Đã thi hành</th>
+        <th rowspan="2" class="text-center align-middle">Ghi chú</th>
+        <th rowspan="2" class="text-center align-middle">Hành động</th>
+    </tr>
+    <tr>
+        <th class="text-center align-middle">Hoãn</th>
+        <th class="text-center align-middle">Tiếp tục</th>
+        <th class="text-center align-middle">Tạm đình chỉ</th>
+        <th class="text-center align-middle">Tiếp tục</th>
+    </tr>
+    </thead>
+
+    <tbody id="tableBody">
+
+    <!-- Load lần đầu nếu có dữ liệu -->
+    <tr th:each="item, stat : ${list}">
+        <td th:text="${stat.count}"></td>
+        <td th:text="${item.sttNgayTl}"></td>
+        <td th:text="${item.banAnQuyetDinh}"></td>
+        <td th:text="${item.personWhoMustExecute}"></td>
+        <td th:text="${item.personToBeExecuted}"></td>
+        <td th:text="${item.qdUyThacDi}"></td>
+        <td th:text="${item.qdUyThacDen}"></td>
+        <td th:text="${item.qdTha}"></td>
+        <td th:text="${item.qdChuaCoDieuKien}"></td>
+        <td th:text="${item.qdRutTha}"></td>
+        <td th:text="${item.qdHoanTha}"></td>
+        <td th:text="${item.qdTiepTucSauHoan}"></td>
+        <td th:text="${item.qdTamDinhChi}"></td>
+        <td th:text="${item.qdTiepTucSauTamDinhChi}"></td>
+        <td th:text="${item.qdDinhChi}"></td>
+        <td th:text="${item.daThiHanhXong}"></td>
+        <td th:text="${item.ghiChu}"></td>
+        <td>
+            <button class="btn btn-warning btn-sm" th:onclick="'openEditModal(' + ${item.id} + ')'">Sửa</button>
+            <button class="btn btn-danger btn-sm" th:onclick="'deleteItem(' + ${item.id} + ')'">Xóa</button>
+            <button class="btn btn-info btn-sm" th:onclick="'showloadFileDoc(' + ${item.id} + ')'">
+                <i class="fa fa-download"></i> .Doc
+            </button>
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+
+<!-- PAGINATION -->
+<div id="pagination" class="mt-2 d-flex gap-1"></div>
+
+<!-- ======================= MODAL ======================= -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm / Sửa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="id">
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Ngày TL</label>
+                        <input id="sttNgayTl" class="form-control" placeholder="dd-MM-yyyy">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Bản án - Quyết định</label>
+                        <input type="text" id="banAnQuyetDinh" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Người phải thi hành</label>
+                        <input type="text" id="personWhoMustExecute" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Người được thi hành</label>
+                        <input type="text" id="personToBeExecuted" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>QĐ Ủy thác đi</label>
+                        <input type="text" id="qdUyThacDi" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>QĐ Ủy thác đến</label>
+                        <input type="text" id="qdUyThacDen" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>QĐ THA dân sự</label>
+                        <input type="text" id="qdTha" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>QĐ chưa có điều kiện</label>
+                        <input type="text" id="qdChuaCoDieuKien" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>QĐ rút THA</label>
+                        <input type="text" id="qdRutTha" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>QĐ hoãn THA</label>
+                        <input type="text" id="qdHoanTha" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>QĐ tiếp tục sau hoãn</label>
+                        <input type="text" id="qdTiepTucSauHoan" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>QĐ tạm đình chỉ</label>
+                        <input type="text" id="qdTamDinhChi" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>QĐ tiếp tục sau tạm đình chỉ</label>
+                        <input type="text" id="qdTiepTucSauTamDinhChi" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>QĐ đình chỉ</label>
+                        <input type="text" id="qdDinhChi" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Đã thi hành xong</label>
+                        <input type="text" id="daThiHanhXong" class="form-control">
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label>Ghi chú</label>
+                        <input type="text" id="ghiChu" class="form-control">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">Đóng</button>
+
+                <button class="btn btn-primary" onclick="saveItem()">Lưu</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- ================== JAVASCRIPT ================== -->
+<script>
+
+    /* ====== Flatpickr cho tất cả input ngày ====== */
+    flatpickr("#searchFrom", { dateFormat: "d-m-Y" });
+    flatpickr("#searchTo", { dateFormat: "d-m-Y" });
+    flatpickr("#sttNgayTl", { dateFormat: "d-m-Y" });
+
+
+    /* ====== MỞ MODAL THÊM ====== */
+    function openCreateModal() {
+        $("#modalTitle").text("Thêm mới");
+        $("#id").val("");
+        $("#editModal input").val("");
+        $("#editModal").modal("show");
+    }
+
+
+    /* ====== LẤY DỮ LIỆU EDIT ====== */
+    function openEditModal(id) {
+        $.get("/api/so-thu-ly/" + id, function (d) {
+            $("#id").val(d.id);
+            $("#sttNgayTl").val(d.sttNgayTl);
+            $("#banAnQuyetDinh").val(d.banAnQuyetDinh);
+            $("#personWhoMustExecute").val(d.personWhoMustExecute);
+            $("#personToBeExecuted").val(d.personToBeExecuted);
+            $("#qdUyThacDi").val(d.qdUyThacDi);
+            $("#qdUyThacDen").val(d.qdUyThacDen);
+            $("#qdTha").val(d.qdTha);
+            $("#qdChuaCoDieuKien").val(d.qdChuaCoDieuKien);
+            $("#qdRutTha").val(d.qdRutTha);
+            $("#qdHoanTha").val(d.qdHoanTha);
+            $("#qdTiepTucSauHoan").val(d.qdTiepTucSauHoan);
+            $("#qdTamDinhChi").val(d.qdTamDinhChi);
+            $("#qdTiepTucSauTamDinhChi").val(d.qdTiepTucSauTamDinhChi);
+            $("#qdDinhChi").val(d.qdDinhChi);
+            $("#daThiHanhXong").val(d.daThiHanhXong);
+            $("#ghiChu").val(d.ghiChu);
+            $("#editModal").modal("show");
+        });
+    }
+
+
+    /* ====== LƯU ====== */
+    function saveItem() {
+
+        let data = {
+            id: $("#id").val(),
+            sttNgayTl: $("#sttNgayTl").val(),
+            banAnQuyetDinh: $("#banAnQuyetDinh").val(),
+            personWhoMustExecute: $("#personWhoMustExecute").val(),
+            personToBeExecuted: $("#personToBeExecuted").val(),
+            qdUyThacDi: $("#qdUyThacDi").val(),
+            qdUyThacDen: $("#qdUyThacDen").val(),
+            qdTha: $("#qdTha").val(),
+            qdChuaCoDieuKien: $("#qdChuaCoDieuKien").val(),
+            qdRutTha: $("#qdRutTha").val(),
+            qdHoanTha: $("#qdHoanTha").val(),
+            qdTiepTucSauHoan: $("#qdTiepTucSauHoan").val(),
+            qdTamDinhChi: $("#qdTamDinhChi").val(),
+            qdTiepTucSauTamDinhChi: $("#qdTiepTucSauTamDinhChi").val(),
+            qdDinhChi: $("#qdDinhChi").val(),
+            daThiHanhXong: $("#daThiHanhXong").val(),
+            ghiChu: $("#ghiChu").val()
+        };
+
+        $.ajax({
+            url: "/api/so-thu-ly",
+            method: data.id ? "PUT" : "POST",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function () {
+                searchData(0); // reload bằng AJAX, không reload page
+                $("#editModal").modal("hide");
+            }
+        });
+    }
+
+
+    /* ====== XÓA ====== */
+    function deleteItem(id) {
+        if (!confirm("Bạn có chắc muốn xóa?")) return;
+
+        $.ajax({
+            url: "/api/so-thu-ly/" + id,
+            method: "DELETE",
+            success: function () {
+                searchData(0);
+            }
+        });
+    }
+
+
+    /* ====== EXPORT ====== */
+    function exportExcel() {
+        window.location.href = "/api/so-thu-ly/export";
+    }
+
+
+    /* ====== DOWNLOAD DOC ====== */
+    function showloadFileDoc(id) {
+        if (!confirm("Bạn có muốn download file DOC?")) return;
+        window.location.href = "/api/so-thu-ly/download-doc/" + id;
+    }
+
+
+    /* ====== SEARCH AJAX + PAGINATION ====== */
+    function searchData(page = 0) {
+        $.ajax({
+            url: "/api/so-thu-ly/search",
+            method: "GET",
+            data: {
+                from: $("#searchFrom").val(),
+                to: $("#searchTo").val(),
+                page: page,
+                size: 10
+            },
+            success: function (res) {
+                renderTable(res.content);
+                renderPagination(res);
+            }
+        });
+    }
+
+
+    function renderTable(list) {
+        let html = "";
+        let index = 1;
+
+        list.forEach(item => {
+            html += `
+                <tr>
+                    <td>${index++}</td>
+                    <td>${item.sttNgayTl || ""}</td>
+                    <td>${item.banAnQuyetDinh || ""}</td>
+                    <td>${item.personWhoMustExecute || ""}</td>
+                    <td>${item.personToBeExecuted || ""}</td>
+                    <td>${item.qdUyThacDi || ""}</td>
+                    <td>${item.qdUyThacDen || ""}</td>
+                    <td>${item.qdTha || ""}</td>
+                    <td>${item.qdChuaCoDieuKien || ""}</td>
+                    <td>${item.qdRutTha || ""}</td>
+                    <td>${item.qdHoanTha || ""}</td>
+                    <td>${item.qdTiepTucSauHoan || ""}</td>
+                    <td>${item.qdTamDinhChi || ""}</td>
+                    <td>${item.qdTiepTucSauTamDinhChi || ""}</td>
+                    <td>${item.qdDinhChi || ""}</td>
+                    <td>${item.daThiHanhXong || ""}</td>
+                    <td>${item.ghiChu || ""}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="openEditModal(${item.id})">Sửa</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteItem(${item.id})">Xóa</button>
+                        <button class="btn btn-info btn-sm" onclick="showloadFileDoc(${item.id})"><i class="fa fa-download"></i> .Doc</button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        $("#tableBody").html(html);
+    }
+
+
+    function renderPagination(res) {
+        let current = res.number;
+        let total = res.totalPages;
+
+        let html = "";
+
+        for (let i = 0; i < total; i++) {
+            html += `
+                <button class="btn btn-sm ${i === current ? "btn-primary" : "btn-outline-primary"}"
+                        onclick="searchData(${i})">
+                    ${i + 1}
+                </button>
+            `;
+        }
+
+        $("#pagination").html(html);
+    }
+
+
+    /* ====== LOAD LẦN ĐẦU ====== */
+    $(document).ready(function () {
+        searchData(0);
+    });
+
+</script>
+
+</body>
+</html>
