@@ -1,11 +1,13 @@
 package com.handler.excel2word.handlerApi.service;
 
+import com.handler.excel2word.core.utils.DateUtil;
 import com.handler.excel2word.dto.ThiHanhAnDTO;
 import com.handler.excel2word.entity.SoThuLyKiemSoat;
 import com.handler.excel2word.handlerApi.Interface.SoThuLyService;
 import com.handler.excel2word.handlerApi.dto.SoThuLyDTO;
 import com.handler.excel2word.handlerApi.repository.SoThuLyRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,12 +15,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SoThuLyServiceImpl implements SoThuLyService {
 
     private final SoThuLyRepository repository;
@@ -47,7 +54,20 @@ public class SoThuLyServiceImpl implements SoThuLyService {
     @Override
     public Page<SoThuLyKiemSoat> queryPage(SoThuLyDTO dto, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        return repository.searchByCreateAt(dto.getBeginDate(), dto.getEndDate(), pageable);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        LocalDate fromDate = dto.getBeginDate() == null ? null : dto.getBeginDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        LocalDate toDate = dto.getEndDate() == null ? null : dto.getEndDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        Page<SoThuLyKiemSoat> soThuLyKiemSoats = repository.searchByCreateAt(fromDate, toDate, pageable);
+        int sizePage = Objects.nonNull(soThuLyKiemSoats) && !CollectionUtils.isEmpty(soThuLyKiemSoats.getContent()) ? soThuLyKiemSoats.getContent().size() : 0;
+        log.info("SoThuLyKiemSoat page: {}", sizePage);
+        return soThuLyKiemSoats;
     }
 
     @Override

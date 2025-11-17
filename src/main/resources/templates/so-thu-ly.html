@@ -35,12 +35,12 @@
         <i class="fa fa-search"></i> Tìm
     </button>
 
-    <div>
+    <div class="d-flex align-items-center gap-2">
         <label class="form-label mb-0">Từ ngày</label>
         <input id="searchFrom" class="form-control" style="width:150px;" placeholder="dd-MM-yyyy">
     </div>
 
-    <div>
+    <div class="d-flex align-items-center gap-2">
         <label class="form-label mb-0">Đến ngày</label>
         <input id="searchTo" class="form-control" style="width:150px;" placeholder="dd-MM-yyyy">
     </div>
@@ -56,28 +56,35 @@
 <table class="table table-bordered table-striped table-sm">
     <thead class="table-cell">
     <tr>
-        <th rowspan="2" class="text-center align-middle">#</th>
+        <th rowspan="2" class="text-center align-middle">ID</th>
         <th rowspan="2" class="text-center align-middle">Ngày TL</th>
-        <th rowspan="2" class="text-center align-middle">Bản án, Quyết định<br><span class="content-note">(Số; Ngày; Tháng; Năm)</span></th>
-        <th rowspan="2" class="text-center align-middle">Người phải thi hành</th>
-        <th rowspan="2" class="text-center align-middle">Người được thi hành</th>
-        <th rowspan="2" class="text-center align-middle">QĐ Ủy thác đi</th>
-        <th rowspan="2" class="text-center align-middle">QĐ Ủy thác đến</th>
-        <th rowspan="2" class="text-center align-middle">QĐ THA dân sự</th>
-        <th rowspan="2" class="text-center align-middle">Không đủ điều kiện</th>
-        <th rowspan="2" class="text-center align-middle">Rút THA</th>
-        <th colspan="2" class="text-center align-middle">Hoãn THA</th>
-        <th colspan="2" class="text-center align-middle">Tạm đình chỉ THA</th>
-        <th rowspan="2" class="text-center align-middle">Đình chỉ</th>
-        <th rowspan="2" class="text-center align-middle">Đã thi hành</th>
-        <th rowspan="2" class="text-center align-middle">Ghi chú</th>
+        <th rowspan="2" class="text-center align-middle">Bản án, Quyết định<br><span class="content-note">(Số; Ngày, tháng, năm; Cơ quan ban hành)</span></th>
+        <th rowspan="2" class="text-center align-middle">Người phải thi hành<br><span class="content-note">(tên địa chỉ)</span></th>
+        <th rowspan="2" class="text-center align-middle">Người được thi hành<br><span class="content-note">(tên địa chỉ)</span></th>
+        <th rowspan="2" class="text-center align-middle">QĐ Ủy thác đi<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền; Nơi BH)</span></th>
+        <th rowspan="2" class="text-center align-middle">QĐ Ủy thác đến<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền; Nơi BH)</span></th>
+
+        <th rowspan="2" class="text-center align-middle">QĐ thi hành án dân sự<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
+        <th rowspan="2" class="text-center align-middle">QĐ về việc chưa có điều kiện thi hành án dân sự<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
+        <th rowspan="2" class="text-center align-middle">QĐ rút Quyết định THA<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
+
+
+        <th colspan="2" class="text-center align-middle">QĐ hoãn thi hành án Dân sự</th>
+
+        <th colspan="2" class="text-center align-middle">QĐ tạm đình chỉ thi hành án dân sự</th>
+
+        <th rowspan="2" class="text-center align-middle">QĐ đình chỉ thi hành án dân sự<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
+        <th rowspan="2" class="text-center align-middle">Đã thi hành xong<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
+
+        <th rowspan="2" class="text-center align-middle">Ghi chú<br><span class="content-note">(Ghi các thông tin như tên chấp hành viên; Vi phạm..)</span></th>
         <th rowspan="2" class="text-center align-middle">Hành động</th>
     </tr>
     <tr>
-        <th class="text-center align-middle">Hoãn</th>
-        <th class="text-center align-middle">Tiếp tục</th>
-        <th class="text-center align-middle">Tạm đình chỉ</th>
-        <th class="text-center align-middle">Tiếp tục</th>
+        <th class="align-middle"><span class="content-note">Số; Ngày, tháng, năm; Lý do Số tiền</span></th>
+        <th class="align-middle">QĐ tiếp tục THA<br><span class="content-note">(Số; Ngày, tháng, năm)</span></th>
+
+        <th class="align-middle"><span class="content-note">Số; Ngày, tháng, năm; Lý do Số tiền</span></th>
+        <th class="align-middle">QĐ tiếp tục THA<br><span class="content-note">(Số; Ngày, tháng, năm)</span></th>
     </tr>
     </thead>
 
@@ -90,24 +97,32 @@
         <td th:text="${item.banAnQuyetDinh}"></td>
         <td th:text="${item.personWhoMustExecute}"></td>
         <td th:text="${item.personToBeExecuted}"></td>
+
         <td th:text="${item.qdUyThacDi}"></td>
         <td th:text="${item.qdUyThacDen}"></td>
+
         <td th:text="${item.qdTha}"></td>
         <td th:text="${item.qdChuaCoDieuKien}"></td>
         <td th:text="${item.qdRutTha}"></td>
+
         <td th:text="${item.qdHoanTha}"></td>
         <td th:text="${item.qdTiepTucSauHoan}"></td>
+
         <td th:text="${item.qdTamDinhChi}"></td>
         <td th:text="${item.qdTiepTucSauTamDinhChi}"></td>
+
         <td th:text="${item.qdDinhChi}"></td>
         <td th:text="${item.daThiHanhXong}"></td>
+
         <td th:text="${item.ghiChu}"></td>
+
         <td>
-            <button class="btn btn-warning btn-sm" th:onclick="'openEditModal(' + ${item.id} + ')'">Sửa</button>
-            <button class="btn btn-danger btn-sm" th:onclick="'deleteItem(' + ${item.id} + ')'">Xóa</button>
-            <button class="btn btn-info btn-sm" th:onclick="'showloadFileDoc(' + ${item.id} + ')'">
-                <i class="fa fa-download"></i> .Doc
-            </button>
+            <button class="btn btn-warning btn-sm"
+                    th:onclick="'openEditModal(' + ${item.id} + ')'">Sửa</button>
+            <button class="btn btn-danger btn-sm"
+                    th:onclick="'deleteItem(' + ${item.id} + ')'">Xóa</button>
+            <button class="btn btn-info btn-sm"
+                    th:onclick="'showloadFileDoc(' + ${item.id} + ')'"><i class="fa fa-download"></i> .Doc</button>
         </td>
     </tr>
 
