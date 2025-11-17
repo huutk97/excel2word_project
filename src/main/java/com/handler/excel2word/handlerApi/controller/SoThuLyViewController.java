@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/so-thu-ly")
+@RequestMapping("/")
 @RequiredArgsConstructor
 public class SoThuLyViewController {
 

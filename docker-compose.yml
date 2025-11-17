@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:15
+    container_name: pgdb
+    environment:
+      POSTGRES_USER: huutk
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: thi_hanh_an
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U huutk"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: excel2word_app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8181:8182"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/thi_hanh_an
+      SPRING_DATASOURCE_USERNAME: huutk
+      SPRING_DATASOURCE_PASSWORD: 123456
+    volumes:
+      - ~/.m2:/root/.m2  # cache Maven để build không lỗi
+    restart: always
+
+volumes:
+  pgdata:
+
+# Các lệnh thường dùng:
+# build all
+#docker compose up -d --build
+# chỉ khởi động app
+#docker compose up -d app
+# chỉ khởi động db
+#docker compose up -d db
+# dừng tất cả
+#docker compose down
+# dừng app
+#docker compose down app
+# dừng db
+#docker compose down db
+# xem log tất cả
+#docker compose logs -f
