@@ -40,12 +40,13 @@
     <tr>
       <td style="width:42%; text-align:center">
         <p style="font-size: 12pt !important;">VIỆN KSND TỈNH NGHỆ AN</p>
-        <p style="font-size: 12pt !important;"><strong>VIỆN KSND HUYỆN ĐÔ LƯƠNG</strong></p>
+        <p style="font-size: 12pt !important;"><strong>VIỆN KSND KHU VỰC 7</strong></p>
+        <p style="font-size: 12pt !important;"><strong>Số: [[${ly.orderNumber}]]/PKS-VKSKV7</strong></p>
       </td>
       <td style="width:58%; text-align:center;">
         <p style="font-size: 12pt !important;"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></p>
         <p><strong>Độc lập - Tự do - Hạnh phúc</strong></p>
-        <p><em>Đô Lương, ngày 24 tháng 12 năm 2024</em></p>
+        <p><em>Đô Lương, ngày [[${ly.ngayTL}]] tháng [[${ly.thangTL}]] năm [[${ly.namTL}]]</em></p>
       </td>
     </tr>
     </tbody>
@@ -54,28 +55,28 @@
   <p style="text-align:center; margin-top:6pt;"><strong>PHIẾU KIỂM SÁT</strong></p>
   <p style="text-align:center;"><strong>Quyết định về thi hành án dân sự, hành chính</strong></p>
   <p></p>
-  <p style="text-align:justify; text-indent:36pt;">Tôi: <strong th:text="${ly.personToBeExecuted}">Nguyễn Tiến Dũng</strong> - Kiểm sát viên được phân công kiểm sát Quyết định thi hành án chủ động số <strong>174</strong> ngày <strong>20 tháng 12 năm 2024</strong> của Chi cục Thi hành án dân sự huyện Đô Lương.
+  <p style="text-align:justify; text-indent:36pt;">Tôi: <strong>[[${ly.ghiChu}]]</strong> - Kiểm sát viên được phân công kiểm sát [[${ly.qdTha}]]
   </p>
 
   <p style="text-align:justify; text-indent:36pt;">
-    Cho thi hành án đối với ông <strong>Trần Văn Sơn</strong>, địa chỉ: Xóm 3, xã Cát Văn, huyện Thanh Chương, tỉnh Nghệ An.
+    Cho thi hành án đối với [[${ly.personWhoMustExecute}]].
   </p>
 
   <p style="text-indent:36pt;">Các khoản phải thi hành:</p>
-  <p style="text-indent:48pt;">1. Án phí HSST 200.000 đồng;</p>
+  <p style="text-indent:48pt;">[[${ly.ndThiHanh}]]</p>
   <p style="text-indent:36pt;">Các tài liệu liên quan khác: Không</p>
 
   <p style="text-indent:36pt; margin-top:6pt;"><strong>1.</strong> Qua kiểm sát quyết định thi hành án về THADS thấy:</p>
 
-  <p style="text-indent:48pt;"><em>1.1. Về thời hạn gửi Quyết định:</em> Đảm bảo quy định tại Điều 38 Luật THADS.</p>
-  <p style="text-indent:48pt;"><em>1.2. Về căn cứ ban hành Quyết định:</em> Đảm bảo đúng quy định pháp luật.</p>
-  <p style="text-indent:48pt;"><em>1.3. Về thẩm quyền ban hành Quyết định:</em> Đảm bảo đúng quy định pháp luật.</p>
-  <p style="text-indent:48pt;"><em>1.4. Về hình thức của Quyết định:</em> Đảm bảo đúng quy định pháp luật.</p>
-  <p style="text-indent:48pt;"><em>1.5. Về nội dung của Quyết định:</em> Đảm bảo đúng quy định pháp luật.</p>
-  <p style="text-indent:48pt;"><em>1.6. Những nội dung khác:</em> Không có.</p>
+  <p style="text-indent:48pt;"><em>1.1. Về thời hạn gửi Quyết định:</em> <span th:text="${#strings.isEmpty(ly.veThoiHanGuiQD) ? '' : ly.veThoiHanGuiQD }"></span></p>
+  <p style="text-indent:48pt;"><em>1.2. Về căn cứ ban hành Quyết định:</em> <span th:text="${#strings.isEmpty(ly.veCanCuBanHanhQD) ? '' : ly.veCanCuBanHanhQD}"></span></p>
+  <p style="text-indent:48pt;"><em>1.3. Về thẩm quyền ban hành Quyết định:</em> <span th:text="${#strings.isEmpty(ly.veThamQuyenBanHanhQD) ? '' : ly.veThamQuyenBanHanhQD}"></span></p>
+  <p style="text-indent:48pt;"><em>1.4. Về hình thức của Quyết định:</em> <span th:text="${#strings.isEmpty(ly.veHinhThucQD) ? '' : ly.veHinhThucQD}"></span></p>
+  <p style="text-indent:48pt;"><em>1.5. Về nội dung của Quyết định:</em> <span th:text="${#strings.isEmpty(ly.veNoiDungQD) ? '' : ly.veNoiDungQD}"></span></p>
+  <p style="text-indent:48pt;"><em>1.6. Những nội dung khác:</em> <span th:text="${#strings.isEmpty(ly.noiDungKhac) ? 'Không có.' : ly.noiDungKhac}"></span></p>
 
   <p style="text-indent:36pt; margin-top:6pt;"><strong>2.</strong> Quan điểm của Kiểm sát viên:</p>
-  <p style="text-indent:48pt;">Việc ban hành quyết định đảm bảo đúng quy định pháp luật.</p>
+  <p style="text-indent:48pt;"><span th:text="${#strings.isEmpty(ly.quanDiemKSV) ? 'Việc ban hành quyết định đảm bảo đúng quy định pháp luật.' : ly.quanDiemKSV}"></span></p>
 
   <p style="text-indent:36pt; margin-top:6pt;"><strong>3.</strong> Ý kiến của Lãnh đạo Viện:</p>
   <p style="text-indent:36pt;">...............................................................................................................................</p>

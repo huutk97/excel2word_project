@@ -1,6 +1,6 @@
 package com.handler.excel2word.handlerApi.Interface;
 
-import com.handler.excel2word.dto.ThiHanhAnDTO;
+import com.handler.excel2word.dto.SoThuLyKiemSoatDTO;
 import com.handler.excel2word.entity.SoThuLyKiemSoat;
 import com.handler.excel2word.handlerApi.dto.SoThuLyDTO;
 import org.springframework.data.domain.Page;
@@ -17,9 +17,11 @@ public interface SoThuLyService {
 
     SoThuLyKiemSoat getById(Long id);
 
+    SoThuLyDTO findById(Long id);
+
     List<SoThuLyKiemSoat> getAll();
 
     Page<SoThuLyKiemSoat> queryPage(SoThuLyDTO dto, int page, int size);
 
-    List<ThiHanhAnDTO> exportExcel(SoThuLyDTO dto) ;
+    List<SoThuLyKiemSoatDTO> exportExcel(SoThuLyDTO dto) ;
 }

@@ -1,7 +1,6 @@
 package com.handler.excel2word.handlerApi.service;
 
-import com.handler.excel2word.core.utils.DateUtil;
-import com.handler.excel2word.dto.ThiHanhAnDTO;
+import com.handler.excel2word.dto.SoThuLyKiemSoatDTO;
 import com.handler.excel2word.entity.SoThuLyKiemSoat;
 import com.handler.excel2word.handlerApi.Interface.SoThuLyService;
 import com.handler.excel2word.handlerApi.dto.SoThuLyDTO;
@@ -17,7 +16,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -54,8 +52,6 @@ public class SoThuLyServiceImpl implements SoThuLyService {
     @Override
     public Page<SoThuLyKiemSoat> queryPage(SoThuLyDTO dto, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
         LocalDate fromDate = dto.getBeginDate() == null ? null : dto.getBeginDate().toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
@@ -77,12 +73,19 @@ public class SoThuLyServiceImpl implements SoThuLyService {
     }
 
     @Override
+    public SoThuLyDTO findById(Long id) {
+        SoThuLyKiemSoat entity = repository.findById(id).orElse(null);
+        SoThuLyDTO dto = convertEntityToDTO(entity);
+        return dto;
+    }
+
+    @Override
     public List<SoThuLyKiemSoat> getAll() {
         return repository.findAll();
     }
 
     @Override
-    public List<ThiHanhAnDTO> exportExcel(SoThuLyDTO dto) {
+    public List<SoThuLyKiemSoatDTO> exportExcel(SoThuLyDTO dto) {
         List<SoThuLyKiemSoat> list =  repository.findAll();
         return convertEntityToDTOs(list);
     }
@@ -95,22 +98,74 @@ public class SoThuLyServiceImpl implements SoThuLyService {
         return e;
     }
 
-    private List<ThiHanhAnDTO> convertEntityToDTOs(List<SoThuLyKiemSoat> entities) {
+    private List<SoThuLyKiemSoatDTO> convertEntityToDTOs(List<SoThuLyKiemSoat> entities) {
         if (CollectionUtils.isEmpty(entities)) {
             return new ArrayList<>();
         }
-        List<ThiHanhAnDTO> result = new ArrayList<>();
-        int index = 1;
+        List<SoThuLyKiemSoatDTO> result = new ArrayList<>();
         for (SoThuLyKiemSoat e : entities) {
-            ThiHanhAnDTO dto = convertEntityToDTO(e);
-            dto.setStt(index++);
+            SoThuLyKiemSoatDTO dto = convertEntityToExcelDTO(e);
             result.add(dto);
         }
         return result;
     }
 
-    private ThiHanhAnDTO convertEntityToDTO(SoThuLyKiemSoat e) {
-        ThiHanhAnDTO dto = new ThiHanhAnDTO();
+    private SoThuLyDTO convertEntityToDTO(SoThuLyKiemSoat e) {
+        if (e == null) {
+            return new SoThuLyDTO();
+        }
+        SoThuLyDTO dto = new SoThuLyDTO();
+        dto.setOrderNumber(e.getOrderNumber());
+
+        String input = e.getSttNgayTl();
+        String[] parts = input.split("-");
+        if (parts.length > 2) {
+            dto.setNgayTL(parts[0].trim());
+            dto.setThangTL(parts[1].trim());
+            dto.setNamTL(parts[2].trim());
+        }
+        dto.setSttNgayTl(e.getSttNgayTl());
+        dto.setBanAnQuyetDinh(e.getBanAnQuyetDinh());
+        dto.setPersonWhoMustExecute(e.getPersonWhoMustExecute());
+        dto.setPersonToBeExecuted(e.getPersonToBeExecuted());
+
+        dto.setQdUyThacDi(e.getQdUyThacDi());
+        dto.setQdUyThacDen(e.getQdUyThacDen());
+
+        dto.setQdTha(e.getQdTha());
+        dto.setNdThiHanh(e.getNdThiHanh());
+        dto.setQdChuaCoDieuKien(e.getQdChuaCoDieuKien());
+        dto.setQdRutTha(e.getQdRutTha());
+
+        dto.setQdHoanTha(e.getQdHoanTha());
+        dto.setQdTiepTucSauHoan(e.getQdTiepTucSauHoan());
+
+        dto.setQdTamDinhChi(e.getQdTamDinhChi());
+        dto.setQdTiepTucSauTamDinhChi(e.getQdTiepTucSauTamDinhChi());
+
+        dto.setQdDinhChi(e.getQdDinhChi());
+        dto.setDaThiHanhXong(e.getDaThiHanhXong());
+
+        dto.setGhiChu(e.getGhiChu());
+        dto.setCreatedAt(e.getCreatedAt());
+        dto.setUpdatedAt(e.getUpdatedAt());
+
+        dto.setVeThoiHanGuiQD(e.getVeThoiHanGuiQD());
+        dto.setVeCanCuBanHanhQD(e.getVeCanCuBanHanhQD());
+        dto.setVeThamQuyenBanHanhQD(e.getVeThamQuyenBanHanhQD());
+        dto.setVeHinhThucQD(e.getVeHinhThucQD());
+        dto.setVeNoiDungQD(e.getVeNoiDungQD());
+        dto.setNoiDungKhac(e.getNoiDungKhac());
+        dto.setQuanDiemKSV(e.getQuanDiemKSV());
+        return dto;
+    }
+
+    private SoThuLyKiemSoatDTO convertEntityToExcelDTO(SoThuLyKiemSoat e) {
+        if (e == null) {
+            return new SoThuLyKiemSoatDTO();
+        }
+        SoThuLyKiemSoatDTO dto = new SoThuLyKiemSoatDTO();
+        dto.setOrderNumber(e.getOrderNumber());
         dto.setSttNgayTl(e.getSttNgayTl());
         dto.setBanAnQuyetDinh(e.getBanAnQuyetDinh());
         dto.setPersonWhoMustExecute(e.getPersonWhoMustExecute());
@@ -120,6 +175,7 @@ public class SoThuLyServiceImpl implements SoThuLyService {
         dto.setQuyetDinhUyThacDen(e.getQdUyThacDen());
 
         dto.setQuyetDinhThiHanhAnDanSu(e.getQdTha());
+        dto.setNdThiHanh(e.getNdThiHanh());
         dto.setQuyetDinhChuaCoDieuKien(e.getQdChuaCoDieuKien());
         dto.setQuyetDinhRutQuyetDinhTHA(e.getQdRutTha());
 
@@ -133,10 +189,20 @@ public class SoThuLyServiceImpl implements SoThuLyService {
         dto.setDaThiHanhXong(e.getDaThiHanhXong());
 
         dto.setGhiChu(e.getGhiChu());
+        dto.setOrderNumber(e.getOrderNumber());
+
+        dto.setVeThoiHanGuiQD(e.getVeThoiHanGuiQD());
+        dto.setVeCanCuBanHanhQD(e.getVeCanCuBanHanhQD());
+        dto.setVeThamQuyenBanHanhQD(e.getVeThamQuyenBanHanhQD());
+        dto.setVeHinhThucQD(e.getVeHinhThucQD());
+        dto.setVeNoiDungQD(e.getVeNoiDungQD());
+        dto.setNoiDungKhac(e.getNoiDungKhac());
+        dto.setQuanDiemKSV(e.getQuanDiemKSV());
         return dto;
     }
 
     private void updateEntity(SoThuLyKiemSoat e, SoThuLyDTO dto) {
+        e.setOrderNumber(dto.getOrderNumber());
         e.setSttNgayTl(dto.getSttNgayTl());
         e.setBanAnQuyetDinh(dto.getBanAnQuyetDinh());
         e.setPersonWhoMustExecute(dto.getPersonWhoMustExecute());
@@ -146,6 +212,7 @@ public class SoThuLyServiceImpl implements SoThuLyService {
         e.setQdUyThacDen(dto.getQdUyThacDen());
 
         e.setQdTha(dto.getQdTha());
+        e.setNdThiHanh(dto.getNdThiHanh());
         e.setQdChuaCoDieuKien(dto.getQdChuaCoDieuKien());
         e.setQdRutTha(dto.getQdRutTha());
 
@@ -165,5 +232,13 @@ public class SoThuLyServiceImpl implements SoThuLyService {
             e.setCreatedAt(new Date());
             e.setUpdatedAt(null);
         }
+
+        e.setVeThoiHanGuiQD(dto.getVeThoiHanGuiQD());
+        e.setVeCanCuBanHanhQD(dto.getVeCanCuBanHanhQD());
+        e.setVeThamQuyenBanHanhQD(dto.getVeThamQuyenBanHanhQD());
+        e.setVeHinhThucQD(dto.getVeHinhThucQD());
+        e.setVeNoiDungQD(dto.getVeNoiDungQD());
+        e.setNoiDungKhac(dto.getNoiDungKhac());
+        e.setQuanDiemKSV(dto.getQuanDiemKSV());
     }
 }

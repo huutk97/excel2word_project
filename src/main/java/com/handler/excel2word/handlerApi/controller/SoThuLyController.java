@@ -2,7 +2,7 @@ package com.handler.excel2word.handlerApi.controller;
 
 import com.handler.excel2word.core.export.Export;
 import com.handler.excel2word.core.utils.DateUtil;
-import com.handler.excel2word.dto.ThiHanhAnDTO;
+import com.handler.excel2word.dto.SoThuLyKiemSoatDTO;
 import com.handler.excel2word.entity.SoThuLyKiemSoat;
 import com.handler.excel2word.handlerApi.Interface.SoThuLyService;
 import com.handler.excel2word.handlerApi.dto.SoThuLyDTO;
@@ -67,13 +67,13 @@ public class SoThuLyController {
         String fileName = URLEncoder.encode(title + DateUtil.getCurrentTime() + ".xlsx", "UTF-8");
         response.setContentType("application/msexcel");
         response.setHeader("Content-disposition", "attachment;filename=" + fileName);
-        List<ThiHanhAnDTO> results = service.exportExcel(dto);
-        Export.exportPoi2(results, ThiHanhAnDTO.class, response.getOutputStream(), null, title);
+        List<SoThuLyKiemSoatDTO> results = service.exportExcel(dto);
+        Export.exportPoi2(results, SoThuLyKiemSoatDTO.class, response.getOutputStream(), null, title);
     }
 
     @GetMapping("search")
     public Page<SoThuLyKiemSoat> searchJson(SoThuLyDTO dto, @RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "10") int size) {
+                                                    @RequestParam(defaultValue = "10") int size) {
         return service.queryPage(dto, page, size);
     }
 
@@ -81,7 +81,7 @@ public class SoThuLyController {
     public ResponseEntity<InputStreamResource> downloadDocx(@PathVariable Long id) throws Exception {
         if (id == null) throw new IllegalArgumentException("ID không được để trống");
 
-        SoThuLyKiemSoat lyKiemSoat = service.getById(id);
+        SoThuLyDTO lyKiemSoat = service.findById(id);
 
         // ----- Render HTML bằng Thymeleaf -----
         Context context = new Context();

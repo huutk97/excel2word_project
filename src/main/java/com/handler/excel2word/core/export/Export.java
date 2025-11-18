@@ -2,14 +2,13 @@ package com.handler.excel2word.core.export;
 
 import com.handler.excel2word.core.utils.DateUtil;
 import com.handler.excel2word.core.utils.LogUtil;
-import com.handler.excel2word.dto.ThiHanhAnDTO;
+import com.handler.excel2word.dto.SoThuLyKiemSoatDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.*;
 
 import java.lang.reflect.*;
 
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.*;
 import org.apache.poi.xssf.streaming.*;
 import org.apache.poi.ss.usermodel.*;
@@ -17,7 +16,6 @@ import org.apache.poi.ss.usermodel.*;
 import java.math.*;
 import java.util.*;
 
-import javax.servlet.http.*;
 import java.io.*;
 
 public class Export {
@@ -124,8 +122,8 @@ public class Export {
             int cellIndex = 0;
 
             // ===================== HEADER =====================
-            // Nếu là ThiHanhAnDTO -> header 2 dòng + merge giống HTML
-            if (ThiHanhAnDTO.class.equals(clazz)) {
+            // Nếu là SoThuLyKiemSoatDTO -> header 2 dòng + merge giống HTML
+            if (SoThuLyKiemSoatDTO.class.equals(clazz)) {
 
                 // tạo 2 dòng header
                 Row headerRow1 = sheet.createRow(rowIndex++);
@@ -141,7 +139,6 @@ public class Export {
 
                 // 1) Các cột rowspan (A đến I) = 9 cột (index 0..8)
                 String[] rowspanHeaders = new String[] {
-                        "STT",
                         "Ngày TL",
                         "Bản án, Quyết định\n(Số; Ngày, tháng, năm; Cơ quan ban hành)",
                         "Người phải thi hành\n(tên địa chỉ)",
@@ -149,6 +146,7 @@ public class Export {
                         "QĐ Ủy thác đi\n(Số; Ngày, tháng, năm; Số tiền; Nơi BH)",
                         "QĐ Ủy thác đến\n(Số; Ngày, tháng, năm; Số tiền; Nơi BH)",
                         "QĐ thi hành án dân sự\n(Số; Ngày, tháng, năm; Số tiền)",
+                        "Nội dung thi hành\n( Các khoản phải thi hành, số tiền)",
                         "QĐ về việc chưa có điều kiện thi hành án dân sự\n(Số; Ngày, tháng, năm; Số tiền)",
                         "QĐ rút Quyết định THA\n(Số; Ngày, tháng, năm; Số tiền)"
                 };
@@ -219,7 +217,14 @@ public class Export {
                 String[] lastHeaders = new String[] {
                         "QĐ đình chỉ thi hành án dân sự\n(Số; Ngày, tháng, năm; Số tiền)",
                         "Đã thi hành xong\n(Số; Ngày, tháng, năm; Số tiền)",
-                        "Ghi chú\n(Ghi các thông tin như tên chấp hành viên; Vi phạm..)"
+                        "Ghi chú\n(Ghi các thông tin như tên chấp hành viên; Vi phạm..)",
+                        "Về thời hạn gửi Quyết định",
+                        "Về căn cứ ban hành Quyết định",
+                        "Về thẩm quyền ban hành Quyết định",
+                        "Về hình thức của Quyết định",
+                        "Về nội dung của Quyết định",
+                        "Những nội dung khác",
+                        "Quan điểm của KSV"
                 };
 
                 for (String title : lastHeaders) {

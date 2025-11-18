@@ -22,6 +22,33 @@
             font-size: 12px;
             font-weight: normal;
         }
+
+        /* scroll ngang */
+        .table-responsive-horizontal {
+            overflow-x: auto;
+            /*white-space: nowrap;*/
+            position: relative;
+        }
+
+        /* Cố định cột Hành động */
+        th.sticky-action,
+        td.sticky-action {
+            position: sticky;
+            right: 0;
+            background: #ffffff;
+            z-index: 10;
+
+            /* Thêm border rõ ràng */
+            border-left: 2px solid #dee2e6;   /* Giống border table Bootstrap */
+            border-right: 2px solid #dee2e6;
+            box-shadow: -4px 0 6px -2px rgba(0,0,0,0.2);
+        }
+
+        /* Header ưu tiên hơn body */
+        th.sticky-action {
+            z-index: 11;
+        }
+
     </style>
 </head>
 <body class="p-4">
@@ -53,81 +80,99 @@
 </div>
 
 <!-- ======================= TABLE ======================= -->
-<table class="table table-bordered table-striped table-sm">
-    <thead class="table-cell">
-    <tr>
-        <th rowspan="2" class="text-center align-middle">ID</th>
-        <th rowspan="2" class="text-center align-middle">Ngày TL</th>
-        <th rowspan="2" class="text-center align-middle">Bản án, Quyết định<br><span class="content-note">(Số; Ngày, tháng, năm; Cơ quan ban hành)</span></th>
-        <th rowspan="2" class="text-center align-middle">Người phải thi hành<br><span class="content-note">(tên địa chỉ)</span></th>
-        <th rowspan="2" class="text-center align-middle">Người được thi hành<br><span class="content-note">(tên địa chỉ)</span></th>
-        <th rowspan="2" class="text-center align-middle">QĐ Ủy thác đi<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền; Nơi BH)</span></th>
-        <th rowspan="2" class="text-center align-middle">QĐ Ủy thác đến<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền; Nơi BH)</span></th>
+<div class="table-responsive-horizontal">
+    <table class="table table-bordered table-striped table-sm">
+        <thead class="table-cell">
+        <tr>
+            <th rowspan="2" class="text-center align-middle">ID</th>
+            <th rowspan="2" class="text-center align-middle">Ngày TL</th>
+            <th rowspan="2" class="text-center align-middle">Bản án, Quyết định<br><span class="content-note">(Số; Ngày, tháng, năm; Cơ quan ban hành)</span></th>
+            <th rowspan="2" class="text-center align-middle">Người phải thi hành<br><span class="content-note">(tên địa chỉ)</span></th>
+            <th rowspan="2" class="text-center align-middle">Người được thi hành<br><span class="content-note">(tên địa chỉ)</span></th>
+            <th rowspan="2" class="text-center align-middle">QĐ Ủy thác đi<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền; Nơi BH)</span></th>
+            <th rowspan="2" class="text-center align-middle">QĐ Ủy thác đến<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền; Nơi BH)</span></th>
 
-        <th rowspan="2" class="text-center align-middle">QĐ thi hành án dân sự<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
-        <th rowspan="2" class="text-center align-middle">QĐ về việc chưa có điều kiện thi hành án dân sự<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
-        <th rowspan="2" class="text-center align-middle">QĐ rút Quyết định THA<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
+            <th rowspan="2" class="text-center align-middle">QĐ thi hành án dân sự<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
+            <th rowspan="2" class="text-center align-middle">Nội dung thi hành<br><span class="content-note">(Các khoản phải thi hành, số tiền)</span></th>
+            <th rowspan="2" class="text-center align-middle">QĐ về việc chưa có điều kiện thi hành án dân sự<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
+            <th rowspan="2" class="text-center align-middle">QĐ rút Quyết định THA<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
 
 
-        <th colspan="2" class="text-center align-middle">QĐ hoãn thi hành án Dân sự</th>
+            <th colspan="2" class="text-center align-middle">QĐ hoãn thi hành án Dân sự</th>
 
-        <th colspan="2" class="text-center align-middle">QĐ tạm đình chỉ thi hành án dân sự</th>
+            <th colspan="2" class="text-center align-middle">QĐ tạm đình chỉ thi hành án dân sự</th>
 
-        <th rowspan="2" class="text-center align-middle">QĐ đình chỉ thi hành án dân sự<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
-        <th rowspan="2" class="text-center align-middle">Đã thi hành xong<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
+            <th rowspan="2" class="text-center align-middle">QĐ đình chỉ thi hành án dân sự<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
+            <th rowspan="2" class="text-center align-middle">Đã thi hành xong<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
 
-        <th rowspan="2" class="text-center align-middle">Ghi chú<br><span class="content-note">(Ghi các thông tin như tên chấp hành viên; Vi phạm..)</span></th>
-        <th rowspan="2" class="text-center align-middle">Hành động</th>
-    </tr>
-    <tr>
-        <th class="align-middle"><span class="content-note">Số; Ngày, tháng, năm; Lý do Số tiền</span></th>
-        <th class="align-middle">QĐ tiếp tục THA<br><span class="content-note">(Số; Ngày, tháng, năm)</span></th>
+            <th rowspan="2" class="text-center align-middle">Ghi chú<br><span class="content-note">(Ghi các thông tin như tên chấp hành viên; Vi phạm..)</span></th>
+            <th rowspan="2" class="text-center align-middle">Về thời hạn gửi Quyết định</th>
+            <th rowspan="2" class="text-center align-middle">Về căn cứ ban hành Quyết định</th>
+            <th rowspan="2" class="text-center align-middle">Về thẩm quyền ban hành Quyết định</th>
+            <th rowspan="2" class="text-center align-middle">Về hình thức của Quyết định</th>
+            <th rowspan="2" class="text-center align-middle">Về nội dung của Quyết định</th>
+            <th rowspan="2" class="text-center align-middle">Những nội dung khác</th>
+            <th rowspan="2" class="text-center align-middle">Quan điểm của KSV</th>
+            <th rowspan="2" class="text-center align-middle sticky-action">Hành động</th>
+        </tr>
+        <tr>
+            <th class="align-middle"><span class="content-note">Số; Ngày, tháng, năm; Lý do Số tiền</span></th>
+            <th class="align-middle">QĐ tiếp tục THA<br><span class="content-note">(Số; Ngày, tháng, năm)</span></th>
 
-        <th class="align-middle"><span class="content-note">Số; Ngày, tháng, năm; Lý do Số tiền</span></th>
-        <th class="align-middle">QĐ tiếp tục THA<br><span class="content-note">(Số; Ngày, tháng, năm)</span></th>
-    </tr>
-    </thead>
+            <th class="align-middle"><span class="content-note">Số; Ngày, tháng, năm; Lý do Số tiền</span></th>
+            <th class="align-middle">QĐ tiếp tục THA<br><span class="content-note">(Số; Ngày, tháng, năm)</span></th>
+        </tr>
+        </thead>
 
-    <tbody id="tableBody">
+        <tbody id="tableBody">
 
-    <!-- Load lần đầu nếu có dữ liệu -->
-    <tr th:each="item, stat : ${list}">
-        <td th:text="${stat.count}"></td>
-        <td th:text="${item.sttNgayTl}"></td>
-        <td th:text="${item.banAnQuyetDinh}"></td>
-        <td th:text="${item.personWhoMustExecute}"></td>
-        <td th:text="${item.personToBeExecuted}"></td>
+        <!-- Load lần đầu nếu có dữ liệu -->
+        <tr th:each="item, stat : ${list}">
+            <td th:text="${stat.count}"></td>
+            <td th:text="${item.formatDateNgayTl}"></td>
+            <td th:text="${item.banAnQuyetDinh}"></td>
+            <td th:text="${item.personWhoMustExecute}"></td>
+            <td th:text="${item.personToBeExecuted}"></td>
 
-        <td th:text="${item.qdUyThacDi}"></td>
-        <td th:text="${item.qdUyThacDen}"></td>
+            <td th:text="${item.qdUyThacDi}"></td>
+            <td th:text="${item.qdUyThacDen}"></td>
 
-        <td th:text="${item.qdTha}"></td>
-        <td th:text="${item.qdChuaCoDieuKien}"></td>
-        <td th:text="${item.qdRutTha}"></td>
+            <td th:text="${item.qdTha}"></td>
+            <td th:text="${item.ndThiHanh}"></td>
+            <td th:text="${item.qdChuaCoDieuKien}"></td>
+            <td th:text="${item.qdRutTha}"></td>
 
-        <td th:text="${item.qdHoanTha}"></td>
-        <td th:text="${item.qdTiepTucSauHoan}"></td>
+            <td th:text="${item.qdHoanTha}"></td>
+            <td th:text="${item.qdTiepTucSauHoan}"></td>
 
-        <td th:text="${item.qdTamDinhChi}"></td>
-        <td th:text="${item.qdTiepTucSauTamDinhChi}"></td>
+            <td th:text="${item.qdTamDinhChi}"></td>
+            <td th:text="${item.qdTiepTucSauTamDinhChi}"></td>
 
-        <td th:text="${item.qdDinhChi}"></td>
-        <td th:text="${item.daThiHanhXong}"></td>
+            <td th:text="${item.qdDinhChi}"></td>
+            <td th:text="${item.daThiHanhXong}"></td>
 
-        <td th:text="${item.ghiChu}"></td>
+            <td th:text="${item.ghiChu}"></td>
+            <td th:text="${item.veThoiHanGuiQD}"></td>
+            <td th:text="${item.veCanCuBanHanhQD}"></td>
+            <td th:text="${item.veThamQuyenBanHanhQD}"></td>
+            <td th:text="${item.veHinhThucQD}"></td>
+            <td th:text="${item.veNoiDungQD}"></td>
+            <td th:text="${item.noiDungKhac}"></td>
+            <td th:text="${item.quanDiemKSV}"></td>
 
-        <td>
-            <button class="btn btn-warning btn-sm"
-                    th:onclick="'openEditModal(' + ${item.id} + ')'">Sửa</button>
-            <button class="btn btn-danger btn-sm"
-                    th:onclick="'deleteItem(' + ${item.id} + ')'">Xóa</button>
-            <button class="btn btn-info btn-sm"
-                    th:onclick="'showloadFileDoc(' + ${item.id} + ')'"><i class="fa fa-download"></i> .Doc</button>
-        </td>
-    </tr>
+            <td th:class="sticky-action" class="sticky-action">
+                <button class="btn btn-warning btn-sm"
+                        th:onclick="'openEditModal(' + ${item.id} + ')'">Sửa</button>
+                <button class="btn btn-danger btn-sm"
+                        th:onclick="'deleteItem(' + ${item.id} + ')'">Xóa</button>
+                <button class="btn btn-info btn-sm"
+                        th:onclick="'showloadFileDoc(' + ${item.id} + ')'"><i class="fa fa-download"></i> .Doc</button>
+            </td>
+        </tr>
 
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 
 <!-- PAGINATION -->
 <div id="pagination" class="mt-2 d-flex gap-1"></div>
@@ -147,6 +192,11 @@
                 <input type="hidden" id="id">
 
                 <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>STT sổ thử lý</label>
+                        <input type="text" id="orderNumber" class="form-control">
+                    </div>
+
                     <div class="col-md-6 mb-3">
                         <label>Ngày TL</label>
                         <input id="sttNgayTl" class="form-control" placeholder="dd-MM-yyyy">
@@ -180,6 +230,11 @@
                     <div class="col-md-6 mb-3">
                         <label>QĐ THA dân sự</label>
                         <input type="text" id="qdTha" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Nội dung thi hành</label>
+                        <input type="text" id="ndThiHanh" class="form-control">
                     </div>
 
                     <div class="col-md-6 mb-3">
@@ -227,6 +282,35 @@
                         <input type="text" id="ghiChu" class="form-control">
                     </div>
 
+                    <div class="col-md-6 mb-3">
+                        <label>Về thời hạn gửi QĐ</label>
+                        <input type="text" id="veThoiHanGuiQD" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Về căn cứ ban hành QĐ</label>
+                        <input type="text" id="veCanCuBanHanhQD" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Về thẩm quyền ban hành QĐ</label>
+                        <input type="text" id="veThamQuyenBanHanhQD" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Về hình thức của QĐ</label>
+                        <input type="text" id="veHinhThucQD" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Về nội dung của QĐ</label>
+                        <input type="text" id="veNoiDungQD" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Những nội dung khác</label>
+                        <input type="text" id="noiDungKhac" class="form-control">
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label>Quan điểm của KSV</label>
+                        <input type="text" id="quanDiemKSV" class="form-control">
+                    </div>
+
                 </div>
             </div>
 
@@ -267,11 +351,13 @@
             $("#id").val(d.id);
             $("#sttNgayTl").val(d.sttNgayTl);
             $("#banAnQuyetDinh").val(d.banAnQuyetDinh);
+            $("#orderNumber").val(d.orderNumber);
             $("#personWhoMustExecute").val(d.personWhoMustExecute);
             $("#personToBeExecuted").val(d.personToBeExecuted);
             $("#qdUyThacDi").val(d.qdUyThacDi);
             $("#qdUyThacDen").val(d.qdUyThacDen);
             $("#qdTha").val(d.qdTha);
+            $("#ndThiHanh").val(d.ndThiHanh);
             $("#qdChuaCoDieuKien").val(d.qdChuaCoDieuKien);
             $("#qdRutTha").val(d.qdRutTha);
             $("#qdHoanTha").val(d.qdHoanTha);
@@ -281,6 +367,13 @@
             $("#qdDinhChi").val(d.qdDinhChi);
             $("#daThiHanhXong").val(d.daThiHanhXong);
             $("#ghiChu").val(d.ghiChu);
+            $("#veThoiHanGuiQD").val(d.veThoiHanGuiQD);
+            $("#veCanCuBanHanhQD").val(d.veCanCuBanHanhQD);
+            $("#veThamQuyenBanHanhQD").val(d.veThamQuyenBanHanhQD);
+            $("#veHinhThucQD").val(d.veHinhThucQD);
+            $("#veNoiDungQD").val(d.veNoiDungQD);
+            $("#noiDungKhac").val(d.noiDungKhac);
+            $("#quanDiemKSV").val(d.quanDiemKSV);
             $("#editModal").modal("show");
         });
     }
@@ -293,11 +386,13 @@
             id: $("#id").val(),
             sttNgayTl: $("#sttNgayTl").val(),
             banAnQuyetDinh: $("#banAnQuyetDinh").val(),
+            orderNumber: $("#orderNumber").val(),
             personWhoMustExecute: $("#personWhoMustExecute").val(),
             personToBeExecuted: $("#personToBeExecuted").val(),
             qdUyThacDi: $("#qdUyThacDi").val(),
             qdUyThacDen: $("#qdUyThacDen").val(),
             qdTha: $("#qdTha").val(),
+            ndThiHanh: $("#ndThiHanh").val(),
             qdChuaCoDieuKien: $("#qdChuaCoDieuKien").val(),
             qdRutTha: $("#qdRutTha").val(),
             qdHoanTha: $("#qdHoanTha").val(),
@@ -306,7 +401,14 @@
             qdTiepTucSauTamDinhChi: $("#qdTiepTucSauTamDinhChi").val(),
             qdDinhChi: $("#qdDinhChi").val(),
             daThiHanhXong: $("#daThiHanhXong").val(),
-            ghiChu: $("#ghiChu").val()
+            ghiChu: $("#ghiChu").val(),
+            veThoiHanGuiQD: $("#veThoiHanGuiQD").val(),
+            veCanCuBanHanhQD: $("#veCanCuBanHanhQD").val(),
+            veThamQuyenBanHanhQD: $("#veThamQuyenBanHanhQD").val(),
+            veHinhThucQD: $("#veHinhThucQD").val(),
+            veNoiDungQD: $("#veNoiDungQD").val(),
+            noiDungKhac: $("#noiDungKhac").val(),
+            quanDiemKSV: $("#quanDiemKSV").val()
         };
 
         $.ajax({
@@ -376,13 +478,14 @@
             html += `
                 <tr>
                     <td>${index++}</td>
-                    <td>${item.sttNgayTl || ""}</td>
+                    <td>${item.formatDateNgayTl || ""}</td>
                     <td>${item.banAnQuyetDinh || ""}</td>
                     <td>${item.personWhoMustExecute || ""}</td>
                     <td>${item.personToBeExecuted || ""}</td>
                     <td>${item.qdUyThacDi || ""}</td>
                     <td>${item.qdUyThacDen || ""}</td>
                     <td>${item.qdTha || ""}</td>
+                    <td>${item.ndThiHanh || ""}</td>
                     <td>${item.qdChuaCoDieuKien || ""}</td>
                     <td>${item.qdRutTha || ""}</td>
                     <td>${item.qdHoanTha || ""}</td>
@@ -392,7 +495,14 @@
                     <td>${item.qdDinhChi || ""}</td>
                     <td>${item.daThiHanhXong || ""}</td>
                     <td>${item.ghiChu || ""}</td>
-                    <td>
+                    <td>${item.veThoiHanGuiQD || ""}</td>
+                    <td>${item.veCanCuBanHanhQD || ""}</td>
+                    <td>${item.veThamQuyenBanHanhQD || ""}</td>
+                    <td>${item.veHinhThucQD || ""}</td>
+                    <td>${item.veNoiDungQD || ""}</td>
+                    <td>${item.noiDungKhac || ""}</td>
+                    <td>${item.quanDiemKSV || ""}</td>
+                    <td class="sticky-action">
                         <button class="btn btn-warning btn-sm" onclick="openEditModal(${item.id})">Sửa</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteItem(${item.id})">Xóa</button>
                         <button class="btn btn-info btn-sm" onclick="showloadFileDoc(${item.id})"><i class="fa fa-download"></i> .Doc</button>

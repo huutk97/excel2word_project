@@ -16,6 +16,9 @@ public class SoThuLyKiemSoat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "order_number")
+    private String orderNumber;
+
     @Column(name = "stt_ngay_tl")
     private String sttNgayTl;
 
@@ -37,8 +40,12 @@ public class SoThuLyKiemSoat {
     @Column(name = "qd_tha")
     private String qdTha;
 
+    @Column(name = "nd_thi_hanh")
+    private String ndThiHanh; // Nội dung thi hành ( Các khoản phải thi hành, số tiền)
+
     @Column(name = "qd_chua_co_dieu_kien")
     private String qdChuaCoDieuKien;
+
 
     @Column(name = "qd_rut_tha")
     private String qdRutTha;
@@ -69,4 +76,40 @@ public class SoThuLyKiemSoat {
 
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    @Column(name = "ve_thoi_han_gui_qd")
+    private String veThoiHanGuiQD;
+    @Column(name = "ve_can_cu_ban_hanh_qd")
+    private String veCanCuBanHanhQD;
+    @Column(name = "ve_tham_quyen_ban_hanh_qd")
+    private String veThamQuyenBanHanhQD;
+    @Column(name = "ve_hinh_thuc_qd")
+    private String veHinhThucQD;
+    @Column(name = "ve_noi_dung_qd")
+    private String veNoiDungQD;
+    @Column(name = "noi_dung_khac")
+    private String noiDungKhac;
+    @Column(name = "quan_diem_ksv")
+    private String quanDiemKSV;
+
+    @Transient
+    private String formatDateNgayTl;
+
+    public String getFormatDateNgayTl() {
+        if (this.sttNgayTl == null) {
+            return "";
+        }
+        try {
+            String[] parts = this.sttNgayTl.split("-");
+            String day = parts[0].trim();
+            String month = parts[1].trim();
+            String year = parts[2].trim();
+
+            return String.format("%s - %s/%s/%s", this.orderNumber, day, month, year);
+
+        } catch (Exception e) {
+            return this.sttNgayTl; // fallback
+        }
+    }
+
 }
