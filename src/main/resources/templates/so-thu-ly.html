@@ -49,6 +49,45 @@
             z-index: 11;
         }
 
+        .copy-tooltip {
+            position: absolute;
+            top: -22px;
+            left: 0;
+            background: #000;
+            color: #fff;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            z-index: 999;
+        }
+
+        .copy-tooltip.fade-out {
+            opacity: 0;
+        }
+
+        .btn-copy {
+            border: none !important;       /* bỏ border */
+            outline: none !important;      /* bỏ outline khi focus */
+            background: transparent;       /* bỏ nền */
+            padding: 0 4px;                /* thu nhỏ nút cho gọn */
+            cursor: pointer;               /* con trỏ dạng click */
+        }
+
+        .btn-copy i {
+            font-size: 14px;
+            color: #666;                   /* màu icon copy */
+            transition: 0.2s;
+        }
+
+        /* hiệu ứng nhấn copy */
+        .btn-copy.copied i {
+            color: #000;
+            transform: scale(1.3);
+        }
+
     </style>
 </head>
 <body class="p-4">
@@ -134,40 +173,144 @@
 
         <!-- Load lần đầu nếu có dữ liệu -->
         <tr th:each="item, stat : ${list}">
-            <td th:text="${stat.count}"></td>
-            <td th:text="${item.formatDateNgayTl}"></td>
-            <td th:text="${item.banAnQuyetDinh}"></td>
-            <td th:text="${item.personWhoMustExecute}"></td>
-            <td th:text="${item.personToBeExecuted}"></td>
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${stat.count}"></span>
+            </td>
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.formatDateNgayTl}"></span>
+            </td>
 
-            <td th:text="${item.qdUyThacDi}"></td>
-            <td th:text="${item.qdUyThacDen}"></td>
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.banAnQuyetDinh}"></span>
+            </td>
 
-            <td th:text="${item.qdTha}"></td>
-            <td th:text="${item.ndThiHanh}"></td>
-            <td th:text="${item.qdChuaCoDieuKien}"></td>
-            <td th:text="${item.qdRutTha}"></td>
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.personWhoMustExecute}"></span>
+            </td>
 
-            <td th:text="${item.qdHoanTha}"></td>
-            <td th:text="${item.qdTiepTucSauHoan}"></td>
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.personToBeExecuted}"></span>
+            </td>
 
-            <td th:text="${item.qdTamDinhChi}"></td>
-            <td th:text="${item.qdTiepTucSauTamDinhChi}"></td>
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.qdUyThacDi}"></span>
+            </td>
 
-            <td th:text="${item.qdDinhChi}"></td>
-            <td th:text="${item.daThiHanhXong}"></td>
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.qdUyThacDen}"></span>
+            </td>
 
-            <td th:text="${item.ghiChu}"></td>
-            <td th:text="${item.veThoiHanGuiQD}"></td>
-            <td th:text="${item.veCanCuBanHanhQD}"></td>
-            <td th:text="${item.veThamQuyenBanHanhQD}"></td>
-            <td th:text="${item.veHinhThucQD}"></td>
-            <td th:text="${item.veNoiDungQD}"></td>
-            <td th:text="${item.noiDungKhac}"></td>
-            <td th:text="${item.quanDiemKSV}"></td>
-            <td th:text="${item.khuVuc}"></td>
-            <td th:text="${item.vienKsndCap}"></td>
-            <td th:text="${item.maPhieu}"></td>
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.qdTha}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.ndThiHanh}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.qdChuaCoDieuKien}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.qdRutTha}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.qdHoanTha}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.qdTiepTucSauHoan}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.qdTamDinhChi}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.qdTiepTucSauTamDinhChi}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.qdDinhChi}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.daThiHanhXong}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.ghiChu}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.veThoiHanGuiQD}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.veCanCuBanHanhQD}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.veThamQuyenBanHanhQD}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.veHinhThucQD}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.veNoiDungQD}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.noiDungKhac}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.quanDiemKSV}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.khuVuc}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.vienKsndCap}"></span>
+            </td>
+
+            <td>
+                <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                <span th:text="${item.maPhieu}"></span>
+            </td>
 
             <td th:class="sticky-action" class="sticky-action">
                 <button class="btn btn-warning btn-sm"
@@ -516,34 +659,144 @@
         list.forEach(item => {
             html += `
                 <tr>
-                    <td>${index++}</td>
-                    <td>${item.formatDateNgayTl || ""}</td>
-                    <td>${item.banAnQuyetDinh || ""}</td>
-                    <td>${item.personWhoMustExecute || ""}</td>
-                    <td>${item.personToBeExecuted || ""}</td>
-                    <td>${item.qdUyThacDi || ""}</td>
-                    <td>${item.qdUyThacDen || ""}</td>
-                    <td>${item.qdTha || ""}</td>
-                    <td>${item.ndThiHanh || ""}</td>
-                    <td>${item.qdChuaCoDieuKien || ""}</td>
-                    <td>${item.qdRutTha || ""}</td>
-                    <td>${item.qdHoanTha || ""}</td>
-                    <td>${item.qdTiepTucSauHoan || ""}</td>
-                    <td>${item.qdTamDinhChi || ""}</td>
-                    <td>${item.qdTiepTucSauTamDinhChi || ""}</td>
-                    <td>${item.qdDinhChi || ""}</td>
-                    <td>${item.daThiHanhXong || ""}</td>
-                    <td>${item.ghiChu || ""}</td>
-                    <td>${item.veThoiHanGuiQD || ""}</td>
-                    <td>${item.veCanCuBanHanhQD || ""}</td>
-                    <td>${item.veThamQuyenBanHanhQD || ""}</td>
-                    <td>${item.veHinhThucQD || ""}</td>
-                    <td>${item.veNoiDungQD || ""}</td>
-                    <td>${item.noiDungKhac || ""}</td>
-                    <td>${item.quanDiemKSV || ""}</td>
-                    <td>${item.khuVuc || ""}</td>
-                    <td>${item.vienKsndCap || ""}</td>
-                    <td>${item.maPhieu || ""}</td>
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${index++}</span>
+                    </td>
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.formatDateNgayTl || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.banAnQuyetDinh || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.personWhoMustExecute || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.personToBeExecuted || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.qdUyThacDi || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.qdUyThacDen || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.qdTha || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.ndThiHanh || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.qdChuaCoDieuKien || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.qdRutTha || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.qdHoanTha || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.qdTiepTucSauHoan || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.qdTamDinhChi || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.qdTiepTucSauTamDinhChi || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.qdDinhChi || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.daThiHanhXong || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.ghiChu || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.veThoiHanGuiQD || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.veCanCuBanHanhQD || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.veThamQuyenBanHanhQD || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.veHinhThucQD || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.veNoiDungQD || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.noiDungKhac || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.quanDiemKSV || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.khuVuc || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.vienKsndCap || ""}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
+                        <span>${item.maPhieu || ""}</span>
+                    </td>
                     <td class="sticky-action">
                         <button class="btn btn-warning btn-sm" onclick="openEditModal(${item.id})">Sửa</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteItem(${item.id})">Xóa</button>
@@ -554,6 +807,48 @@
         });
 
         $("#tableBody").html(html);
+    }
+
+    function copyCell(td) {
+        const value = td.innerText.trim();
+        if (!value) return;
+
+        navigator.clipboard.writeText(value).then(() => {
+            td.style.background = "#ffff99";
+            setTimeout(() => td.style.background = "", 300);
+        });
+    }
+
+    function copyTdValue(btn) {
+        const td = btn.parentElement;
+        const value = td.querySelector("span").innerText.trim();
+
+        navigator.clipboard.writeText(value).then(() => {
+
+            // Tạo tooltip
+            let tooltip = document.createElement("div");
+            tooltip.className = "copy-tooltip";
+            tooltip.innerText = "Đã copy!";
+
+            // Thêm vào body để nó tách khỏi td
+            document.body.appendChild(tooltip);
+
+            // Lấy vị trí button để đặt tooltip đúng chỗ
+            const rect = btn.getBoundingClientRect();
+
+            tooltip.style.left = rect.left + window.scrollX + "px";
+            tooltip.style.top = rect.top + window.scrollY - 30 + "px"; // nằm trên nút 30px
+
+            // hiệu ứng fade
+            setTimeout(() => {
+                tooltip.classList.add("fade-out");
+            }, 700);
+
+            // xoá tooltip
+            setTimeout(() => {
+                tooltip.remove();
+            }, 1000);
+        });
     }
 
 
