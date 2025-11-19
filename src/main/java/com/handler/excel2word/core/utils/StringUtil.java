@@ -1,6 +1,8 @@
 package com.handler.excel2word.core.utils;
 
 
+import org.apache.commons.text.WordUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -227,6 +229,13 @@ public class StringUtil {
         }
 
         return tNonceStr;
+    }
+
+    public static String capitalizeFully(String value) {
+        if (value == null) {
+            return "";
+        }
+        return WordUtils.capitalizeFully(value);
     }
 
     public static void main(String[] args) {

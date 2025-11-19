@@ -92,6 +92,15 @@ public class SoThuLyKiemSoat {
     @Column(name = "quan_diem_ksv")
     private String quanDiemKSV;
 
+    @Column(name = "khu_vuc")
+    private String khuVuc;
+
+    @Column(name = "vien_ksnd_cap")
+    private String vienKsndCap;
+
+    @Column(name = "ma_phieu")
+    private String maPhieu;
+
     @Transient
     private String formatDateNgayTl;
 

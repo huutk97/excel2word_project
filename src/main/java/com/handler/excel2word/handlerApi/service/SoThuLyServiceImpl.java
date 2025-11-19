@@ -157,6 +157,10 @@ public class SoThuLyServiceImpl implements SoThuLyService {
         dto.setVeNoiDungQD(e.getVeNoiDungQD());
         dto.setNoiDungKhac(e.getNoiDungKhac());
         dto.setQuanDiemKSV(e.getQuanDiemKSV());
+
+        dto.setMaPhieu(e.getMaPhieu());
+        dto.setVienKsndCap(e.getVienKsndCap());
+        dto.setKhuVuc(e.getKhuVuc());
         return dto;
     }
 
@@ -198,6 +202,10 @@ public class SoThuLyServiceImpl implements SoThuLyService {
         dto.setVeNoiDungQD(e.getVeNoiDungQD());
         dto.setNoiDungKhac(e.getNoiDungKhac());
         dto.setQuanDiemKSV(e.getQuanDiemKSV());
+
+        dto.setMaPhieu(e.getMaPhieu());
+        dto.setVienKsndCap(e.getVienKsndCap());
+        dto.setKhuVuc(e.getKhuVuc());
         return dto;
     }
 
@@ -240,5 +248,9 @@ public class SoThuLyServiceImpl implements SoThuLyService {
         e.setVeNoiDungQD(dto.getVeNoiDungQD());
         e.setNoiDungKhac(dto.getNoiDungKhac());
         e.setQuanDiemKSV(dto.getQuanDiemKSV());
+
+        e.setMaPhieu(dto.getMaPhieu());
+        e.setVienKsndCap(dto.getVienKsndCap());
+        e.setKhuVuc(dto.getKhuVuc());
     }
 }

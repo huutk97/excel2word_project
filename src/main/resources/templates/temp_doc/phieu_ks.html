@@ -31,6 +31,10 @@
       padding: 1pt;
       vertical-align: top;
     }
+    .vien-ksnd-cap {
+      border-bottom: 2px solid black;
+      text-underline-offset: 6px;
+    }
   </style>
 </head>
 <body>
@@ -39,14 +43,14 @@
     <tbody>
     <tr>
       <td style="width:42%; text-align:center">
-        <p style="font-size: 12pt !important;">VIỆN KSND TỈNH NGHỆ AN</p>
-        <p style="font-size: 12pt !important;"><strong>VIỆN KSND KHU VỰC 7</strong></p>
-        <p style="font-size: 12pt !important;"><strong>Số: [[${ly.orderNumber}]]/PKS-VKSKV7</strong></p>
+        <p style="font-size: 12pt !important;">VIỆN KSND TỈNH <span th:text="${#strings.toUpperCase(ly.khuVuc)}"></span></p>
+        <p style="font-size: 12pt !important;"><u><strong><span class="vien-ksnd-cap" th:text="${#strings.toUpperCase(ly.vienKsndCap)}"></span></strong></u></p>
+        <p style="font-size: 12pt !important;"><strong>Số: [[${ly.orderNumber}]]/<span th:text="${#strings.toUpperCase(ly.maPhieu)}"></span></strong></p>
       </td>
       <td style="width:58%; text-align:center;">
         <p style="font-size: 12pt !important;"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></p>
-        <p><strong>Độc lập - Tự do - Hạnh phúc</strong></p>
-        <p><em>Đô Lương, ngày [[${ly.ngayTL}]] tháng [[${ly.thangTL}]] năm [[${ly.namTL}]]</em></p>
+        <p><u><strong style="font-weight:bold;">Độc lập - Tự do - Hạnh phúc</strong></u></p>
+        <p><em>[[${T(com.handler.excel2word.core.utils.StringUtil).capitalizeFully(ly.khuVuc)}]], ngày [[${ly.ngayTL}]] tháng [[${ly.thangTL}]] năm [[${ly.namTL}]]</em></p>
       </td>
     </tr>
     </tbody>
@@ -92,13 +96,13 @@
         <p><strong>PHÓ VIỆN TRƯỞNG</strong></p>
         <p style="text-align:center;"></p>
         <p style="text-align:center;"><br></p>
-        <p style="margin-top:36pt;"><strong>Trần Xuân Thủy</strong></p>
+        <p style="margin-top:36pt;"><strong></strong></p>
       </td>
       <td style="width:50%; text-align:center;">
         <p><strong>Kiểm sát viên</strong></p>
         <p style="text-align:center;"><br></p>
         <p style="text-align:center;"><br></p>
-        <p style="margin-top:36pt;"><strong>Nguyễn Tiến Dũng</strong></p>
+        <p style="margin-top:36pt;"><strong>[[${ly.ghiChu}]]</strong></p>
       </td>
     </tr>
     </tbody>

@@ -31,6 +31,7 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -124,7 +125,8 @@ public class SoThuLyController {
         XHTMLImporterImpl importer = new XHTMLImporterImpl(wordMLPackage);
         wordMLPackage.getMainDocumentPart().getContent().addAll(importer.convert(xhtml, null));
 
-        File tempFile = File.createTempFile("phieu_ks_", ".docx");
+        String name = lyKiemSoat.getOrderNumber() + " - " + lyKiemSoat.getSttNgayTl() + DateUtil.dateToYMDHMSNo(new Date());
+        File tempFile = File.createTempFile(name, ".docx");
         wordMLPackage.save(tempFile);
 
         byte[] bytes = Files.readAllBytes(tempFile.toPath());
@@ -132,7 +134,7 @@ public class SoThuLyController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=phieu_ks_" + id + ".docx");
+                "attachment; filename=" + name + ".docx");
 
         return ResponseEntity.ok()
                 .headers(headers)

@@ -54,4 +54,7 @@ public class SoThuLyDTO {
     private String quanDiemKSV;
 
     private String formatDateNgayTl;
+    private String maPhieu;
+    private String vienKsndCap;
+    private String khuVuc;
 }

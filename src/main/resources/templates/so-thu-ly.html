@@ -52,6 +52,9 @@
     </style>
 </head>
 <body class="p-4">
+<!-- ⬇⬇⬇ LOADER ĐƯỢC INJECT Ở ĐÂY -->
+<div th:replace="fragments/loader :: loader"></div>
+<!-- ⬆⬆⬆ -->
 
 <h2>Danh sách sổ thụ lý</h2>
 
@@ -105,7 +108,7 @@
             <th rowspan="2" class="text-center align-middle">QĐ đình chỉ thi hành án dân sự<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
             <th rowspan="2" class="text-center align-middle">Đã thi hành xong<br><span class="content-note">(Số; Ngày, tháng, năm; Số tiền)</span></th>
 
-            <th rowspan="2" class="text-center align-middle">Ghi chú<br><span class="content-note">(Ghi các thông tin như tên chấp hành viên; Vi phạm..)</span></th>
+            <th rowspan="2" class="text-center align-middle">Kiểm sát viên</th>
             <th rowspan="2" class="text-center align-middle">Về thời hạn gửi Quyết định</th>
             <th rowspan="2" class="text-center align-middle">Về căn cứ ban hành Quyết định</th>
             <th rowspan="2" class="text-center align-middle">Về thẩm quyền ban hành Quyết định</th>
@@ -113,6 +116,9 @@
             <th rowspan="2" class="text-center align-middle">Về nội dung của Quyết định</th>
             <th rowspan="2" class="text-center align-middle">Những nội dung khác</th>
             <th rowspan="2" class="text-center align-middle">Quan điểm của KSV</th>
+            <th rowspan="2" class="text-center align-middle">Khu vực</th>
+            <th rowspan="2" class="text-center align-middle">Tên Viện KSND Cấp</th>
+            <th rowspan="2" class="text-center align-middle">Mã Phiếu</th>
             <th rowspan="2" class="text-center align-middle sticky-action">Hành động</th>
         </tr>
         <tr>
@@ -159,6 +165,9 @@
             <td th:text="${item.veNoiDungQD}"></td>
             <td th:text="${item.noiDungKhac}"></td>
             <td th:text="${item.quanDiemKSV}"></td>
+            <td th:text="${item.khuVuc}"></td>
+            <td th:text="${item.vienKsndCap}"></td>
+            <td th:text="${item.maPhieu}"></td>
 
             <td th:class="sticky-action" class="sticky-action">
                 <button class="btn btn-warning btn-sm"
@@ -277,8 +286,8 @@
                         <input type="text" id="daThiHanhXong" class="form-control">
                     </div>
 
-                    <div class="col-md-12 mb-3">
-                        <label>Ghi chú</label>
+                    <div class="col-md-6 mb-3">
+                        <label>Kiểm sát viên</label>
                         <input type="text" id="ghiChu" class="form-control">
                     </div>
 
@@ -306,7 +315,23 @@
                         <label>Những nội dung khác</label>
                         <input type="text" id="noiDungKhac" class="form-control">
                     </div>
-                    <div class="col-md-12 mb-3">
+
+                    <div class="col-md-6 mb-3">
+                        <label>Mã Phiếu</label>
+                        <input type="text" id="maPhieu" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Tên Viện KSND Cấp</label>
+                        <input type="text" id="vienKsndCap" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Khu vực</label>
+                        <input type="text" id="khuVuc" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
                         <label>Quan điểm của KSV</label>
                         <input type="text" id="quanDiemKSV" class="form-control">
                     </div>
@@ -374,6 +399,9 @@
             $("#veNoiDungQD").val(d.veNoiDungQD);
             $("#noiDungKhac").val(d.noiDungKhac);
             $("#quanDiemKSV").val(d.quanDiemKSV);
+            $("#maPhieu").val(d.maPhieu);
+            $("#vienKsndCap").val(d.vienKsndCap);
+            $("#khuVuc").val(d.khuVuc);
             $("#editModal").modal("show");
         });
     }
@@ -381,7 +409,7 @@
 
     /* ====== LƯU ====== */
     function saveItem() {
-
+        showLoader();
         let data = {
             id: $("#id").val(),
             sttNgayTl: $("#sttNgayTl").val(),
@@ -408,6 +436,9 @@
             veHinhThucQD: $("#veHinhThucQD").val(),
             veNoiDungQD: $("#veNoiDungQD").val(),
             noiDungKhac: $("#noiDungKhac").val(),
+            maPhieu: $("#maPhieu").val(),
+            vienKsndCap: $("#vienKsndCap").val(),
+            khuVuc: $("#khuVuc").val(),
             quanDiemKSV: $("#quanDiemKSV").val()
         };
 
@@ -418,6 +449,7 @@
             data: JSON.stringify(data),
             success: function () {
                 searchData(0); // reload bằng AJAX, không reload page
+                hideLoader();
                 $("#editModal").modal("hide");
             }
         });
@@ -427,12 +459,13 @@
     /* ====== XÓA ====== */
     function deleteItem(id) {
         if (!confirm("Bạn có chắc muốn xóa?")) return;
-
+        showLoader();
         $.ajax({
             url: "/api/so-thu-ly/" + id,
             method: "DELETE",
             success: function () {
                 searchData(0);
+                hideLoader();
             }
         });
     }
@@ -440,19 +473,24 @@
 
     /* ====== EXPORT ====== */
     function exportExcel() {
+        showLoader();
         window.location.href = "/api/so-thu-ly/export";
+        setTimeout(hideLoader, 2000);
     }
 
 
     /* ====== DOWNLOAD DOC ====== */
     function showloadFileDoc(id) {
         if (!confirm("Bạn có muốn download file DOC?")) return;
+        showLoader();
         window.location.href = "/api/so-thu-ly/download-doc/" + id;
+        setTimeout(hideLoader, 2000);
     }
 
 
     /* ====== SEARCH AJAX + PAGINATION ====== */
     function searchData(page = 0) {
+        showLoader();
         $.ajax({
             url: "/api/so-thu-ly/search",
             method: "GET",
@@ -465,6 +503,7 @@
             success: function (res) {
                 renderTable(res.content);
                 renderPagination(res);
+                hideLoader();
             }
         });
     }
@@ -502,6 +541,9 @@
                     <td>${item.veNoiDungQD || ""}</td>
                     <td>${item.noiDungKhac || ""}</td>
                     <td>${item.quanDiemKSV || ""}</td>
+                    <td>${item.khuVuc || ""}</td>
+                    <td>${item.vienKsndCap || ""}</td>
+                    <td>${item.maPhieu || ""}</td>
                     <td class="sticky-action">
                         <button class="btn btn-warning btn-sm" onclick="openEditModal(${item.id})">Sửa</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteItem(${item.id})">Xóa</button>

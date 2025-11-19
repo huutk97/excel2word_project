@@ -77,6 +77,9 @@ public class SoThuLyKiemSoatDTO {
     private String quanDiemKSV;
 
     private String orderNumber;
+    private String maPhieu;
+    private String vienKsndCap;
+    private String khuVuc;
 
     public String formatDateNgayTl() {
         if (this.sttNgayTl == null) {
