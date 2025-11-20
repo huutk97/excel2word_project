@@ -5,6 +5,7 @@ import com.handler.excel2word.entity.SoThuLyKiemSoat;
 import com.handler.excel2word.handlerApi.dto.SoThuLyDTO;
 import org.springframework.data.domain.Page;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public interface SoThuLyService {
@@ -24,4 +25,6 @@ public interface SoThuLyService {
     Page<SoThuLyKiemSoat> queryPage(SoThuLyDTO dto, int page, int size);
 
     List<SoThuLyKiemSoatDTO> exportExcel(SoThuLyDTO dto) ;
+
+    SoThuLyDTO copyFromId(SoThuLyKiemSoat existing) throws InvocationTargetException, IllegalAccessException;
 }

@@ -28,6 +28,7 @@ import org.thymeleaf.context.Context;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -70,6 +71,13 @@ public class SoThuLyController {
         response.setHeader("Content-disposition", "attachment;filename=" + fileName);
         List<SoThuLyKiemSoatDTO> results = service.exportExcel(dto);
         Export.exportPoi2(results, SoThuLyKiemSoatDTO.class, response.getOutputStream(), null, title);
+    }
+
+    @PostMapping("/copy/{id}")
+    public ResponseEntity<SoThuLyDTO> copy(@PathVariable Long id) throws InvocationTargetException, IllegalAccessException {
+        SoThuLyKiemSoat existing = service.getById(id);
+        SoThuLyDTO dto = service.copyFromId(existing);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("search")

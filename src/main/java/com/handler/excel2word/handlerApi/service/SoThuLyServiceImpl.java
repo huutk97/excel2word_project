@@ -7,6 +7,7 @@ import com.handler.excel2word.handlerApi.dto.SoThuLyDTO;
 import com.handler.excel2word.handlerApi.repository.SoThuLyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -88,6 +90,49 @@ public class SoThuLyServiceImpl implements SoThuLyService {
     public List<SoThuLyKiemSoatDTO> exportExcel(SoThuLyDTO dto) {
         List<SoThuLyKiemSoat> list =  repository.findAll();
         return convertEntityToDTOs(list);
+    }
+
+    @Override
+    public SoThuLyDTO copyFromId(SoThuLyKiemSoat old) throws InvocationTargetException, IllegalAccessException {
+        SoThuLyKiemSoat copy = new SoThuLyKiemSoat();
+
+        // Copy toàn bộ field TRỪ ID, createdAt, updatedAt
+        copy.setOrderNumber(old.getOrderNumber());
+        copy.setSttNgayTl(old.getSttNgayTl());
+        copy.setBanAnQuyetDinh(old.getBanAnQuyetDinh());
+        copy.setPersonWhoMustExecute(old.getPersonWhoMustExecute());
+        copy.setPersonToBeExecuted(old.getPersonToBeExecuted());
+        copy.setQdUyThacDi(old.getQdUyThacDi());
+        copy.setQdUyThacDen(old.getQdUyThacDen());
+        copy.setQdTha(old.getQdTha());
+        copy.setNdThiHanh(old.getNdThiHanh());
+        copy.setQdChuaCoDieuKien(old.getQdChuaCoDieuKien());
+        copy.setQdRutTha(old.getQdRutTha());
+        copy.setQdHoanTha(old.getQdHoanTha());
+        copy.setQdTiepTucSauHoan(old.getQdTiepTucSauHoan());
+        copy.setQdTamDinhChi(old.getQdTamDinhChi());
+        copy.setQdTiepTucSauTamDinhChi(old.getQdTiepTucSauTamDinhChi());
+        copy.setQdDinhChi(old.getQdDinhChi());
+        copy.setDaThiHanhXong(old.getDaThiHanhXong());
+        copy.setGhiChu(old.getGhiChu());
+        copy.setVeThoiHanGuiQD(old.getVeThoiHanGuiQD());
+        copy.setVeCanCuBanHanhQD(old.getVeCanCuBanHanhQD());
+        copy.setVeThamQuyenBanHanhQD(old.getVeThamQuyenBanHanhQD());
+        copy.setVeHinhThucQD(old.getVeHinhThucQD());
+        copy.setVeNoiDungQD(old.getVeNoiDungQD());
+        copy.setNoiDungKhac(old.getNoiDungKhac());
+        copy.setQuanDiemKSV(old.getQuanDiemKSV());
+        copy.setKhuVuc(old.getKhuVuc());
+        copy.setVienKsndCap(old.getVienKsndCap());
+        copy.setMaPhieu(old.getMaPhieu());
+
+        // Set thời gian mới
+        copy.setCreatedAt(new Date());
+        copy.setUpdatedAt(null);
+
+        // Lưu entity mới -> Hibernate sẽ gán id mới
+        SoThuLyKiemSoat saved = repository.save(copy);
+        return convertEntityToDTO(saved);
     }
 
 

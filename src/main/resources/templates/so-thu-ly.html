@@ -95,7 +95,7 @@
 <div th:replace="fragments/loader :: loader"></div>
 <!-- ⬆⬆⬆ -->
 
-<h2>Danh sách sổ thụ lý</h2>
+<h2>SỔ THỤ LÝ KIỂM SÁT THI HÀNH ÁN DÂN SỰ</h2>
 
 <!-- ======================= TÌM KIẾM ======================= -->
 <div class="d-flex gap-3 mb-3 align-items-end">
@@ -319,6 +319,10 @@
                         th:onclick="'deleteItem(' + ${item.id} + ')'">Xóa</button>
                 <button class="btn btn-info btn-sm"
                         th:onclick="'showloadFileDoc(' + ${item.id} + ')'"><i class="fa fa-download"></i> .Doc</button>
+                <button class="btn btn-secondary btn-sm mt-1"
+                        th:onclick="'copyRow(' + ${item.id} + ')'">
+                    Copy hàng
+                </button>
             </td>
         </tr>
 
@@ -592,8 +596,9 @@
             data: JSON.stringify(data),
             success: function () {
                 searchData(0); // reload bằng AJAX, không reload page
-                hideLoader();
                 $("#editModal").modal("hide");
+            }, complete: function () {
+                hideLoader();   // 🔥 luôn chạy
             }
         });
     }
@@ -608,7 +613,8 @@
             method: "DELETE",
             success: function () {
                 searchData(0);
-                hideLoader();
+            }, complete: function () {
+                hideLoader();   // 🔥 luôn chạy
             }
         });
     }
@@ -625,9 +631,47 @@
     /* ====== DOWNLOAD DOC ====== */
     function showloadFileDoc(id) {
         if (!confirm("Bạn có muốn download file DOC?")) return;
+
         showLoader();
-        window.location.href = "/api/so-thu-ly/download-doc/" + id;
-        setTimeout(hideLoader, 2000);
+
+        $.ajax({
+            url: "/api/so-thu-ly/download-doc/" + id,
+            method: "GET",
+            xhrFields: {
+                responseType: 'blob'   // nhận file dạng blob
+            },
+            success: function (data, status, xhr) {
+
+                // Lấy tên file từ header nếu có
+                let filename = "";
+                let disposition = xhr.getResponseHeader('Content-Disposition');
+                if (disposition && disposition.indexOf('attachment') !== -1) {
+                    let match = disposition.match(/filename="?([^"]+)"?/);
+                    if (match && match[1]) filename = match[1];
+                }
+                if (!filename) filename = "download.docx";
+
+                // Tạo Blob
+                let blob = new Blob([data], {
+                    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                });
+
+                // Tạo link ảo
+                let link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                hideLoader();
+            },
+            error: function () {
+                alert("Không thể download file!");
+                hideLoader();
+            }
+        });
     }
 
 
@@ -646,7 +690,8 @@
             success: function (res) {
                 renderTable(res.content);
                 renderPagination(res);
-                hideLoader();
+            }, complete: function () {
+                hideLoader();   // 🔥 luôn chạy
             }
         });
     }
@@ -801,6 +846,7 @@
                         <button class="btn btn-warning btn-sm" onclick="openEditModal(${item.id})">Sửa</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteItem(${item.id})">Xóa</button>
                         <button class="btn btn-info btn-sm" onclick="showloadFileDoc(${item.id})"><i class="fa fa-download"></i> .Doc</button>
+                        <button class="btn btn-secondary btn-sm mt-1" onclick="copyRow(${item.id})">Copy hàng</button>
                     </td>
                 </tr>
             `;
@@ -809,13 +855,22 @@
         $("#tableBody").html(html);
     }
 
-    function copyCell(td) {
-        const value = td.innerText.trim();
-        if (!value) return;
+    function copyRow(id) {
+        if (!confirm("Bạn có muốn copy hàng này và tạo một bản ghi mới?")) return;
+        showLoader();
 
-        navigator.clipboard.writeText(value).then(() => {
-            td.style.background = "#ffff99";
-            setTimeout(() => td.style.background = "", 300);
+        $.ajax({
+            url: "/api/so-thu-ly/copy/" + id,   // endpoint copy (sẽ tạo mới 1 bản ghi)
+            method: "POST",
+            success: function () {
+                // sau khi copy xong, load lại page 0 để thấy hàng mới trên đầu
+                searchData(0);
+            },
+            error: function () {
+                alert("Có lỗi xảy ra khi copy hàng!");
+            }, complete: function () {
+                hideLoader();   // 🔥 luôn chạy
+            }
         });
     }
 
