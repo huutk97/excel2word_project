@@ -88,3 +88,10 @@ dist/
 npm-debug.log
 yarn-debug.log
 yarn-error.log
+#gcloud
+.gcloud/
+.config/
+config/
+gcloud/
+#target
+target/classes/
