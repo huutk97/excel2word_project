@@ -12,6 +12,7 @@ import org.docx4j.model.structure.PageSizePaper;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.wml.ObjectFactory;
 import org.docx4j.wml.RFonts;
+import org.docx4j.wml.SectPr;
 import org.docx4j.wml.Style;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,6 +30,7 @@ import org.thymeleaf.context.Context;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -109,18 +111,44 @@ public class SoThuLyController {
         String xhtml = doc.outerHtml();
 
         // ---- Tạo Word ----
+        // ---- Tạo Word ----
         WordprocessingMLPackage wordMLPackage =
                 WordprocessingMLPackage.createPackage(PageSizePaper.A4, false);
 
         ObjectFactory factory = new ObjectFactory();
 
-        // Font
+// =====  SET MARGIN =====
+        SectPr sectPr = wordMLPackage.getMainDocumentPart()
+                .getJaxbElement()
+                .getBody()
+                .getSectPr();
+
+        if (sectPr == null) {
+            sectPr = factory.createSectPr();
+            wordMLPackage.getMainDocumentPart()
+                    .getJaxbElement()
+                    .getBody()
+                    .setSectPr(sectPr);
+        }
+
+        SectPr.PgMar pgMar = new SectPr.PgMar();
+        pgMar.setTop(BigInteger.valueOf(1134));      // 2 cm
+        pgMar.setBottom(BigInteger.valueOf(1134));   // 2 cm
+        pgMar.setRight(BigInteger.valueOf(1134));    // 2 cm
+        pgMar.setLeft(BigInteger.valueOf(1701));     // 3 cm
+
+        sectPr.setPgMar(pgMar);
+// ===== END SET MARGIN =====
+
+
+// ---- Font ----
         RFonts rfonts = factory.createRFonts();
         rfonts.setAscii("Times New Roman");
         rfonts.setHAnsi("Times New Roman");
         rfonts.setCs("Times New Roman");
 
-        Style normalStyle = wordMLPackage.getMainDocumentPart()
+        Style normalStyle = wordMLPackage
+                .getMainDocumentPart()
                 .getStyleDefinitionsPart()
                 .getStyleById("Normal");
 
@@ -152,16 +180,5 @@ public class SoThuLyController {
                 .body(new InputStreamResource(new ByteArrayInputStream(bytes)));
     }
 
-    private String readFileToString(ClassPathResource resource) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-        }
-        return sb.toString();
-    }
 }
 
