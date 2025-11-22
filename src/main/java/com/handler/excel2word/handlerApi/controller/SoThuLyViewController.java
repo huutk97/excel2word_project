@@ -25,6 +25,8 @@ public class SoThuLyViewController {
         model.addAttribute("list", list.getContent());
         model.addAttribute("page", page);
         model.addAttribute("totalPages", list.getTotalPages());
+        model.addAttribute("totalElements", list.getTotalElements());
+        model.addAttribute("numberOfElements", list.getNumberOfElements());
         return "so-thu-ly";  // templates/list.html
     }
 }

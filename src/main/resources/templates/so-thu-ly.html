@@ -88,6 +88,53 @@
             transform: scale(1.3);
         }
 
+
+        /* Hiệu ứng hover chung cho tất cả button */
+        .btn,
+        .btn-copy {
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+        }
+
+        /* Hover: hơi nổi lên + đổ bóng nhẹ */
+        .btn:hover,
+        .btn-copy:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Khi click giữ chuột: hơi thu nhỏ lại */
+        .btn:active,
+        .btn-copy:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* ===== Ripple effect khi click ===== */
+
+        .btn,
+        .btn-copy {
+            position: relative;
+            overflow: hidden; /* để ripple không tràn ra ngoài */
+        }
+
+        /* Phần tử ripple */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background-color: rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+        }
+
+        /* Animation cho ripple */
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
     </style>
 </head>
 <body class="p-4">
@@ -99,7 +146,7 @@
 
 <!-- ======================= TÌM KIẾM ======================= -->
 <div class="d-flex gap-3 mb-3 align-items-end">
-
+    <button class="btn btn-danger" onclick="deleteMultiple()">Xóa nhiều</button>
     <button class="btn btn-info gap-2" onclick="searchData()">
         <i class="fa fa-search"></i> Tìm
     </button>
@@ -126,6 +173,9 @@
     <table class="table table-bordered table-striped table-sm">
         <thead class="table-cell">
         <tr>
+            <th rowspan="2" class="text-center align-middle">
+                <input type="checkbox" id="checkAll" onclick="toggleCheckAll(this)">
+            </th>
             <th rowspan="2" class="text-center align-middle">ID</th>
             <th rowspan="2" class="text-center align-middle">Ngày TL</th>
             <th rowspan="2" class="text-center align-middle">Bản án, Quyết định<br><span class="content-note">(Số; Ngày, tháng, năm; Cơ quan ban hành)</span></th>
@@ -173,6 +223,9 @@
 
         <!-- Load lần đầu nếu có dữ liệu -->
         <tr th:each="item, stat : ${list}">
+            <td class="text-center">
+                <input type="checkbox" class="row-check" value="${item.id}">
+            </td>
             <td>
                 <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
                 <span th:text="${stat.count}"></span>
@@ -331,7 +384,36 @@
 </div>
 
 <!-- PAGINATION -->
-<div id="pagination" class="mt-2 d-flex gap-1"></div>
+<div class="mt-2 d-flex justify-content-between align-items-center">
+
+    <!-- BÊN TRÁI: PAGE SIZE + PAGINATION -->
+    <div class="d-flex align-items-center gap-3">
+
+        <!-- CHỌN SỐ DÒNG -->
+        <div class="d-flex align-items-center gap-2">
+            <label class="mb-0">Hiển thị</label>
+            <select id="pageSize" class="form-select form-select-sm" style="width: 90px;"
+                    onchange="searchData(0)">
+                <option value="10" selected>10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+            </select>
+        </div>
+
+        <!-- PAGINATION -->
+        <div id="pagination" class="d-flex gap-1"></div>
+
+    </div>
+
+    <!-- BÊN PHẢI: TỔNG SỐ HÀNG -->
+    <div id="totalCountLabel" class="fw-bold">
+        Tổng số bản ghi: <span id="totalElements" th:text="${totalElements}">0</span>
+    </div>
+
+</div>
+<!-- ⭐⭐⭐ KẾT THÚC BLOCK ⭐⭐⭐ -->
 
 <!-- ======================= MODAL ======================= -->
 <div class="modal fade" id="editModal" tabindex="-1">
@@ -619,6 +701,36 @@
         });
     }
 
+    function deleteMultiple() {
+        let ids = [];
+
+        $(".row-check:checked").each(function() {
+            ids.push($(this).val());
+        });
+
+        if (ids.length === 0) {
+            alert("Vui lòng chọn ít nhất 1 hàng để xóa!");
+            return;
+        }
+
+        if (!confirm("Bạn có chắc muốn xóa " + ids.length + " bản ghi này?")) return;
+
+        showLoader();
+
+        $.ajax({
+            url: "/api/so-thu-ly/delete-multiple",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(ids),
+            success: function () {
+                searchData(0);
+            },
+            complete: function () {
+                hideLoader();
+            }
+        });
+    }
+
 
     /* ====== EXPORT ====== */
     function exportExcel() {
@@ -685,11 +797,13 @@
                 from: $("#searchFrom").val(),
                 to: $("#searchTo").val(),
                 page: page,
-                size: 10
+                size: $("#pageSize").val()
             },
             success: function (res) {
                 renderTable(res.content);
                 renderPagination(res);
+                var totalElements = res.totalElements;
+                $("#totalCountLabel").text("Tổng số bản ghi: " + totalElements);
             }, complete: function () {
                 hideLoader();   // 🔥 luôn chạy
             }
@@ -704,6 +818,9 @@
         list.forEach(item => {
             html += `
                 <tr>
+                    <td class="text-center">
+                        <input type="checkbox" class="row-check" value="${item.id}">
+                    </td>
                     <td>
                         <button class="btn-copy" onclick="copyTdValue(this)"><i class="fa fa-copy"></i></button>
                         <span>${index++}</span>
@@ -874,6 +991,10 @@
         });
     }
 
+    function toggleCheckAll(cb) {
+        $(".row-check").prop("checked", cb.checked);
+    }
+
     function copyTdValue(btn) {
         const td = btn.parentElement;
         const value = td.querySelector("span").innerText.trim();
@@ -929,6 +1050,37 @@
     /* ====== LOAD LẦN ĐẦU ====== */
     $(document).ready(function () {
         searchData(0);
+    });
+
+
+    /* ====== HIỆU ỨNG RIPPLE KHI CLICK BUTTON ====== */
+    document.addEventListener("click", function (e) {
+        const target = e.target;
+
+        // nếu click là button hoặc nằm trong button
+        const btn = target.closest(".btn, .btn-copy");
+        if (!btn) return;
+
+        const rect = btn.getBoundingClientRect();
+        const circle = document.createElement("span");
+        const diameter = Math.max(rect.width, rect.height);
+        const radius = diameter / 2;
+
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${e.clientX - rect.left - radius}px`;
+        circle.style.top = `${e.clientY - rect.top - radius}px`;
+        circle.classList.add("ripple");
+
+        // Xoá ripple cũ nếu có
+        const oldRipple = btn.querySelector(".ripple");
+        if (oldRipple) {
+            oldRipple.remove();
+        }
+
+        btn.appendChild(circle);
+
+        // ripple tự mất sau khi animation xong
+        setTimeout(() => circle.remove(), 600);
     });
 
 </script>
