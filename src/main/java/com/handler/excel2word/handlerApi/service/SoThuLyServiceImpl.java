@@ -7,7 +7,6 @@ import com.handler.excel2word.handlerApi.dto.SoThuLyDTO;
 import com.handler.excel2word.handlerApi.repository.SoThuLyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -69,6 +68,11 @@ public class SoThuLyServiceImpl implements SoThuLyService {
     }
 
     @Override
+    public void deleteAllById(List<Long> ids) {
+        repository.deleteAllById(ids);
+    }
+
+    @Override
     public SoThuLyKiemSoat getById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Not found"));
@@ -88,7 +92,15 @@ public class SoThuLyServiceImpl implements SoThuLyService {
 
     @Override
     public List<SoThuLyKiemSoatDTO> exportExcel(SoThuLyDTO dto) {
-        List<SoThuLyKiemSoat> list =  repository.findAll();
+        LocalDate fromDate = dto.getBeginDate() == null ? null : dto.getBeginDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        LocalDate toDate = dto.getEndDate() == null ? null : dto.getEndDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        List<SoThuLyKiemSoat> list =  repository.findAllByFilter(fromDate, toDate);
         return convertEntityToDTOs(list);
     }
 

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface SoThuLyRepository extends JpaRepository<SoThuLyKiemSoat, Long> {
@@ -19,4 +20,11 @@ public interface SoThuLyRepository extends JpaRepository<SoThuLyKiemSoat, Long> 
             @Param("from") LocalDate from,
             @Param("to") LocalDate to,
             Pageable pageable);
+
+    @Query(" SELECT s FROM SoThuLyKiemSoat s WHERE (:from IS NULL OR s.createdAt >= :from) " +
+            "AND (:to IS NULL OR s.createdAt <= :to) " +
+            "ORDER BY s.orderNumber ASC, s.id DESC")
+    List<SoThuLyKiemSoat> findAllByFilter(
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to);
 }

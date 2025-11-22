@@ -24,6 +24,8 @@ public interface SoThuLyService {
 
     Page<SoThuLyKiemSoat> queryPage(SoThuLyDTO dto, int page, int size);
 
+    void deleteAllById(List<Long> ids);
+
     List<SoThuLyKiemSoatDTO> exportExcel(SoThuLyDTO dto) ;
 
     SoThuLyDTO copyFromId(SoThuLyKiemSoat existing) throws InvocationTargetException, IllegalAccessException;

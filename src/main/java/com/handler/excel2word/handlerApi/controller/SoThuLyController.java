@@ -88,6 +88,12 @@ public class SoThuLyController {
         return service.queryPage(dto, page, size);
     }
 
+    @PostMapping("/delete-multiple")
+    public ResponseEntity<?> deleteMultiple(@RequestBody List<Long> ids) {
+        service.deleteAllById(ids);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/download-doc/{id}")
     public ResponseEntity<InputStreamResource> downloadDocx(@PathVariable Long id) throws Exception {
         if (id == null) throw new IllegalArgumentException("ID không được để trống");
