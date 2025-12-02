@@ -135,6 +135,30 @@
             }
         }
 
+        /* Modal Overlay */
+        #authModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Modal Box */
+        #authBox {
+            background: white;
+            padding: 30px;
+            width: 350px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
     </style>
 </head>
 <body class="p-4">
@@ -580,6 +604,18 @@
     </div>
 </div>
 
+
+<div id="authModal">
+    <div id="authBox">
+        <h2>Nhập mã Google Authenticator</h2>
+
+        <input id="googleCode"
+               type="text"
+               placeholder="Nhập mã Google 6 số">
+
+        <button onclick="submitCode()">Submit</button>
+    </div>
+</div>
 
 <!-- ================== JAVASCRIPT ================== -->
 <script>
@@ -1081,6 +1117,59 @@
 
         // ripple tự mất sau khi animation xong
         setTimeout(() => circle.remove(), 600);
+    });
+
+    // Kiểm tra token có còn hiệu lực không
+    function checkGoogleAuth() {
+        const valid = localStorage.getItem("google_auth_valid");
+        const expireTime = localStorage.getItem("google_auth_expire");
+
+        if (valid && expireTime) {
+            const now = new Date().getTime();
+            if (now < parseInt(expireTime)) {
+                return true; // token còn hạn → cho vào hệ thống
+            }
+        }
+        return false;
+    }
+
+    async function submitCode() {
+        const code = document.getElementById("googleCode").value;
+
+        if (!code) {
+            alert("Vui lòng nhập mã Google!");
+            return;
+        }
+
+        try {
+            let response = await fetch(`/api/config/authGoogle?code=${code}`);
+
+            if (!response.ok) throw new Error("AUTH FAIL");
+
+            let data = await response.json();
+
+            // Lưu trạng thái vào localStorage với hạn 24 giờ
+            localStorage.setItem("google_auth_valid", "true");
+            localStorage.setItem("google_auth_expire", (Date.now() + 24 * 60 * 60 * 1000).toString());
+
+            // Ẩn modal và hiện giao diện chính
+            document.getElementById("authModal").style.display = "none";
+
+        } catch (err) {
+            alert("❌ Mã Google không đúng! Nhập lại.");
+        }
+    }
+
+    // Khi trang load → kiểm tra token trong localStorage
+    document.addEventListener("DOMContentLoaded", () => {
+        if (checkGoogleAuth()) {
+            // Không cần nhập lại mã
+            document.getElementById("authModal").style.display = "none";
+            document.getElementById("mainApp").style.display = "block";
+        } else {
+            // Yêu cầu nhập mã lại
+            document.getElementById("authModal").style.display = "flex";
+        }
     });
 
 </script>

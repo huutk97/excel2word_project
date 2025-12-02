@@ -1,6 +1,6 @@
 package com.handler.excel2word.handlerApi.controller;
 
-import com.handler.excel2word.entity.SoThuLyKiemSoat;
+import com.handler.excel2word.handlerApi.entity.SoThuLyKiemSoat;
 import com.handler.excel2word.handlerApi.Interface.SoThuLyService;
 import com.handler.excel2word.handlerApi.dto.SoThuLyDTO;
 import lombok.RequiredArgsConstructor;
