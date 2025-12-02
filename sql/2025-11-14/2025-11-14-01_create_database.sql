@@ -92,3 +92,22 @@ INSERT INTO so_thu_ly_kiem_soat (id, stt_ngay_tl, ban_an_quyet_dinh, person_who_
 INSERT INTO so_thu_ly_kiem_soat (id, stt_ngay_tl, ban_an_quyet_dinh, person_who_must_execute, person_to_be_executed, qd_chua_co_dieu_kien, qd_hoan_tha, qd_tiep_tuc_sau_hoan, qd_tam_dinh_chi, qd_tiep_tuc_sau_tam_dinh_chi, qd_dinh_chi, da_thi_hanh_xong, ghi_chu, created_at, updated_at, qd_rut_tha, qd_uy_thac_den, qd_uy_thac_di, qd_tha, order_number, ve_thoi_han_gui_qd, ve_can_cu_ban_hanh_qd, ve_tham_quyen_ban_hanh_qd, ve_hinh_thuc_qd, ve_noi_dung_qd, noi_dung_khac, quan_diem_ksv, nd_thi_hanh) VALUES (6, '09-10-2025', 'QĐ công nhận số:  10/2025/QĐ- CNHG-DS ngày  04/06/2025 TAND KV7 - NA', 'Bà Hoàng Thị Kiên - Đ/c: Xã Nghĩa Hành - NA', 'Ông Hồ Văn Hùng -  Đ/c: Xã Nghĩa Hành - NA', '', '', '', '', '', '', '', 'QĐ thi hành án theo yêu cầu', '2025-11-15', null, '', '', '', 'Số: 96/QĐ-THADS ngày 06/10/2025 buộc trả lại số tiền: 105.000.000đ', '03', null, null, null, null, null, null, null, null);
 INSERT INTO so_thu_ly_kiem_soat (id, stt_ngay_tl, ban_an_quyet_dinh, person_who_must_execute, person_to_be_executed, qd_chua_co_dieu_kien, qd_hoan_tha, qd_tiep_tuc_sau_hoan, qd_tam_dinh_chi, qd_tiep_tuc_sau_tam_dinh_chi, qd_dinh_chi, da_thi_hanh_xong, ghi_chu, created_at, updated_at, qd_rut_tha, qd_uy_thac_den, qd_uy_thac_di, qd_tha, order_number, ve_thoi_han_gui_qd, ve_can_cu_ban_hanh_qd, ve_tham_quyen_ban_hanh_qd, ve_hinh_thuc_qd, ve_noi_dung_qd, noi_dung_khac, quan_diem_ksv, nd_thi_hanh) VALUES (5, '09-10-2025', 'Bản án số: 08/2022/DS-ST ngày 28/12/2022 - TAND KV7 - NA & BA PT số: 97/2024/DS-PT ngày 10/9/24 TAND tỉnh NA', 'Ông Hoàng Đình Lâm - Bà Nguyễn Thị Thuý; Đ/c: Xã Tân Kỳ, tỉnh Nghệ An', 'Bà Lê Thị Hoa - Đ/c: XÃ Anh Sơn Đông - NA', '', '', '', '', '', '', '', 'QĐ thi hành án theo yêu cầu', '2025-11-15', null, '', '', '', 'Số: 36/QĐ-THADS ngày 04/10/2025 buộc trả lại số đất nông nghiệp: 33.726,5m2', '02', null, null, null, null, null, null, null, null);
 
+CREATE TABLE config (
+                        config_id SERIAL PRIMARY KEY,
+                        config_name VARCHAR(150),
+                        config_key VARCHAR(255),
+                        config_value TEXT,
+                        config_type INTEGER,
+                        config_remark VARCHAR(255),
+                        config_sort INTEGER,
+                        enlarge_memo TEXT,
+                        enable_status INTEGER,
+                        ascription_type INTEGER, -- 1: sms, 2: mail
+                        updated_at TIMESTAMP ,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        CONSTRAINT ui_config_config_name_config UNIQUE (config_name, config_key)
+);
+
+COMMENT ON COLUMN config.ascription_type IS '1: sms 2: mail';
+
+INSERT INTO config (config_name, config_key, config_value, config_type, config_remark, config_sort, enlarge_memo, enable_status, ascription_type, updated_at, created_at) select 'system_config', 'google_auth_secret', 'EUKKIHTNFAIT4ADK', 1, '', 0, null, 1, 0, now(), now() where not exists (select 1 from config where config_name='system_config' and config_key='google_auth_secret');

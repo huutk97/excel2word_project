@@ -1,4 +1,4 @@
-package com.handler.excel2word.entity;
+package com.handler.excel2word.handlerApi.entity;
 
 import lombok.Getter;
 import lombok.Setter;

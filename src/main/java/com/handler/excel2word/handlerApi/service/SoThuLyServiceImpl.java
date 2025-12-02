@@ -1,7 +1,7 @@
 package com.handler.excel2word.handlerApi.service;
 
 import com.handler.excel2word.dto.SoThuLyKiemSoatDTO;
-import com.handler.excel2word.entity.SoThuLyKiemSoat;
+import com.handler.excel2word.handlerApi.entity.SoThuLyKiemSoat;
 import com.handler.excel2word.handlerApi.Interface.SoThuLyService;
 import com.handler.excel2word.handlerApi.dto.SoThuLyDTO;
 import com.handler.excel2word.handlerApi.repository.SoThuLyRepository;

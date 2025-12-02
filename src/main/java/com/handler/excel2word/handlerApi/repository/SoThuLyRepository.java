@@ -1,6 +1,6 @@
 package com.handler.excel2word.handlerApi.repository;
 
-import com.handler.excel2word.entity.SoThuLyKiemSoat;
+import com.handler.excel2word.handlerApi.entity.SoThuLyKiemSoat;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
