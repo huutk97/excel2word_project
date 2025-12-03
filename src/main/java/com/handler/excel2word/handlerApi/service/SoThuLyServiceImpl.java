@@ -292,7 +292,7 @@ public class SoThuLyServiceImpl implements SoThuLyService {
         e.setDaThiHanhXong(dto.getDaThiHanhXong());
 
         e.setGhiChu(dto.getGhiChu());
-        e.setCreatedAt(dto.getCreateAt());
+//        e.setCreatedAt(dto.getCreateAt());
         e.setUpdatedAt(new Date());
         if (e.getId() == null) {
             e.setCreatedAt(new Date());
