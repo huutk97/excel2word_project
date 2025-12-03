@@ -33,6 +33,7 @@ for rev in $REVISIONS; do
     --project=$PROJECT_ID
 done
 
+
 echo "➡️ 4. Xóa Docker images cũ (chỉ giữ image mới nhất)..."
 IMAGES=$(gcloud artifacts docker images list \
   asia-southeast1-docker.pkg.dev/$PROJECT_ID/excel2word-repo \
@@ -49,5 +50,30 @@ for img in $IMAGES; do
   fi
 done
 
-echo "🎉 Hoàn tất tối ưu chi phí cho Google Cloud!"
-echo "🔥 Tất cả cài đặt đã được cập nhật an toàn."
+
+echo "➡️ 5. Disable API không cần thiết (nếu đang bật) – an toàn tuyệt đối..."
+
+DELETE_LIST=(
+  "bigquery.googleapis.com"
+  "bigquerystorage.googleapis.com"
+  "compute.googleapis.com"
+  "container.googleapis.com"
+  "firestore.googleapis.com"
+  "spanner.googleapis.com"
+  "dataproc.googleapis.com"
+  "dataflow.googleapis.com"
+  "pubsub.googleapis.com"
+  "notebook.googleapis.com"
+)
+
+for API in "${DELETE_LIST[@]}"; do
+  if gcloud services list --enabled --project=$PROJECT_ID \
+       --format="value(config.name)" | grep -q "$API"; then
+      echo "  - Disable API: $API"
+      gcloud services disable $API --quiet --project=$PROJECT_ID --force
+  else
+      echo "  - API $API không bật → bỏ qua"
+  fi
+done
+
+echo "🎉 Hoàn tất tối ưu chi phí Google Cloud!"
