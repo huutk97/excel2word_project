@@ -1,5 +1,6 @@
 package com.handler.excel2word.handlerApi.service;
 
+import com.handler.excel2word.core.utils.DateUtil;
 import com.handler.excel2word.dto.SoThuLyKiemSoatDTO;
 import com.handler.excel2word.handlerApi.entity.SoThuLyKiemSoat;
 import com.handler.excel2word.handlerApi.Interface.SoThuLyService;
@@ -15,12 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -53,18 +51,27 @@ public class SoThuLyServiceImpl implements SoThuLyService {
     @Override
     public Page<SoThuLyKiemSoat> queryPage(SoThuLyDTO dto, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        LocalDate fromDate = dto.getBeginDate() == null ? null : dto.getBeginDate().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
 
-        LocalDate toDate = dto.getEndDate() == null ? null : dto.getEndDate().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
+        Date from = DateUtil.getDateStart(dto.getBeginDate());
+        Date to   = DateUtil.getDateEnd(dto.getEndDate());
 
-        Page<SoThuLyKiemSoat> soThuLyKiemSoats = repository.searchByCreateAt(fromDate, toDate, pageable);
-        int sizePage = Objects.nonNull(soThuLyKiemSoats) && !CollectionUtils.isEmpty(soThuLyKiemSoats.getContent()) ? soThuLyKiemSoats.getContent().size() : 0;
-        log.info("SoThuLyKiemSoat page: {}", sizePage);
-        return soThuLyKiemSoats;
+        // Trường hợp 1: cả from và to đều null → lấy tất cả
+        if (from == null && to == null) {
+            return repository.findAllData(pageable);
+        }
+
+        // Trường hợp 2: chỉ from có
+        if (from != null && to == null) {
+            return repository.findFrom(from, pageable);
+        }
+
+        // Trường hợp 3: chỉ to có
+        if (from == null && to != null) {
+            return repository.findTo(to, pageable);
+        }
+
+        // Trường hợp 4: đủ cả hai
+        return repository.findByRange(from, to, pageable);
     }
 
     @Override
@@ -92,15 +99,9 @@ public class SoThuLyServiceImpl implements SoThuLyService {
 
     @Override
     public List<SoThuLyKiemSoatDTO> exportExcel(SoThuLyDTO dto) {
-        LocalDate fromDate = dto.getBeginDate() == null ? null : dto.getBeginDate().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-
-        LocalDate toDate = dto.getEndDate() == null ? null : dto.getEndDate().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-
-        List<SoThuLyKiemSoat> list =  repository.findAllByFilter(fromDate, toDate);
+        Date from = DateUtil.getDateStart(dto.getBeginDate());
+        Date to   = DateUtil.getDateEnd(dto.getEndDate());
+        List<SoThuLyKiemSoat> list =  queryList(from, to);
         return convertEntityToDTOs(list);
     }
 
@@ -309,5 +310,23 @@ public class SoThuLyServiceImpl implements SoThuLyService {
         e.setMaPhieu(dto.getMaPhieu());
         e.setVienKsndCap(dto.getVienKsndCap());
         e.setKhuVuc(dto.getKhuVuc());
+    }
+
+    private List<SoThuLyKiemSoat> queryList(Date from, Date to) {
+        if (from == null && to == null) {
+            return repository.findAllOrder();
+        }
+
+        // 2) Chỉ có from
+        if (from != null && to == null) {
+            return repository.findFrom(from);
+        }
+
+        // 3) Chỉ có to
+        if (from == null && to != null) {
+            return repository.findTo(to);
+        }
+
+        return repository.findRange(from, to);
     }
 }
