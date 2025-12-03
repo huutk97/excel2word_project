@@ -771,7 +771,23 @@
     /* ====== EXPORT ====== */
     function exportExcel() {
         showLoader();
-        window.location.href = "/api/so-thu-ly/export";
+
+        let begin = $("#searchFrom").val();
+        let end = $("#searchTo").val();
+
+        // Convert format dd-MM-yyyy → yyyy-MM-dd
+        begin = begin ? formatDateToYMD(begin) : "";
+        end = end ? formatDateToYMD(end) : "";
+
+        // Tạo query param
+        let url = "/api/so-thu-ly/export?";
+
+        if (begin) url += "beginDate=" + encodeURIComponent(begin) + "&";
+        if (end) url += "endDate=" + encodeURIComponent(end) + "&";
+
+        // Chuyển trình duyệt sang URL tải file
+        window.location.href = url;
+
         setTimeout(hideLoader, 2000);
     }
 
@@ -826,12 +842,19 @@
     /* ====== SEARCH AJAX + PAGINATION ====== */
     function searchData(page = 0) {
         showLoader();
+
+        let begin = $("#searchFrom").val();
+        let end = $("#searchTo").val();
+
+        begin = begin ? formatDateToYMD(begin) : null;
+        end = end ? formatDateToYMD(end) : null;
+
         $.ajax({
             url: "/api/so-thu-ly/search",
             method: "GET",
             data: {
-                from: $("#searchFrom").val(),
-                to: $("#searchTo").val(),
+                beginDate: begin,
+                endDate: end,
                 page: page,
                 size: $("#pageSize").val()
             },
@@ -844,6 +867,20 @@
                 hideLoader();   // 🔥 luôn chạy
             }
         });
+    }
+
+    function formatDateToYMD(dateStr) {
+        if (!dateStr) return null; // nếu null hoặc empty thì trả về null
+
+        // Tách chuỗi: dd-MM-yyyy
+        const parts = dateStr.split("-");
+        if (parts.length !== 3) return null;
+
+        const dd = parts[0];
+        const mm = parts[1];
+        const yyyy = parts[2];
+
+        return `${yyyy}-${mm}-${dd}`;
     }
 
 

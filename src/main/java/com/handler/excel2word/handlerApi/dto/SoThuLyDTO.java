@@ -1,6 +1,7 @@
 package com.handler.excel2word.handlerApi.dto;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -41,7 +42,9 @@ public class SoThuLyDTO {
     private String ghiChu;
     private Date createAt;
     private Date updatedAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date beginDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
     private Date createdAt;
 
