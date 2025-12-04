@@ -14,13 +14,13 @@ import java.util.List;
 @Repository
 public interface SoThuLyRepository extends JpaRepository<SoThuLyKiemSoat, Long> {
 
-    @Query("SELECT s FROM SoThuLyKiemSoat s WHERE s.createdAt BETWEEN :from AND :to")
+    @Query("SELECT s FROM SoThuLyKiemSoat s WHERE TO_DATE(s.sttNgayTl, 'DD-MM-YYYY') BETWEEN :from AND :to")
     Page<SoThuLyKiemSoat> findByRange(@Param("from") Date from, @Param("to") Date to, Pageable pageable);
 
-    @Query("SELECT s FROM SoThuLyKiemSoat s WHERE s.createdAt >= :from")
+    @Query("SELECT s FROM SoThuLyKiemSoat s WHERE TO_DATE(s.sttNgayTl, 'DD-MM-YYYY') >= :from")
     Page<SoThuLyKiemSoat> findFrom(@Param("from") Date from, Pageable pageable);
 
-    @Query("SELECT s FROM SoThuLyKiemSoat s WHERE s.createdAt <= :to")
+    @Query("SELECT s FROM SoThuLyKiemSoat s WHERE TO_DATE(s.sttNgayTl, 'DD-MM-YYYY') <= :to")
     Page<SoThuLyKiemSoat> findTo(@Param("to") Date to, Pageable pageable);
 
     @Query("SELECT s FROM SoThuLyKiemSoat s")
@@ -28,17 +28,17 @@ public interface SoThuLyRepository extends JpaRepository<SoThuLyKiemSoat, Long> 
 
     // export excel
     @Query("SELECT s FROM SoThuLyKiemSoat s " +
-            "WHERE s.createdAt BETWEEN :from AND :to " +
+            "WHERE TO_DATE(s.sttNgayTl, 'DD-MM-YYYY') BETWEEN :from AND :to " +
             "ORDER BY s.orderNumber ASC, s.id DESC")
     List<SoThuLyKiemSoat> findRange(@Param("from") Date from, @Param("to") Date to);
 
     @Query("SELECT s FROM SoThuLyKiemSoat s " +
-            "WHERE s.createdAt >= :from " +
+            "WHERE TO_DATE(s.sttNgayTl, 'DD-MM-YYYY') >= :from " +
             "ORDER BY s.orderNumber ASC, s.id DESC")
     List<SoThuLyKiemSoat> findFrom(@Param("from") Date from);
 
     @Query("SELECT s FROM SoThuLyKiemSoat s " +
-            "WHERE s.createdAt <= :to " +
+            "WHERE TO_DATE(s.sttNgayTl, 'DD-MM-YYYY') <= :to " +
             "ORDER BY s.orderNumber ASC, s.id DESC")
     List<SoThuLyKiemSoat> findTo(@Param("to") Date to);
 
