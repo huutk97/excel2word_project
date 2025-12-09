@@ -101,6 +101,12 @@ public class SoThuLyKiemSoat {
     @Column(name = "ma_phieu")
     private String maPhieu;
 
+    @Column(name = "userId")
+    private Long userId;
+
+    @Column(name = "account")
+    private String account;
+
     @Transient
     private String formatDateNgayTl;
 

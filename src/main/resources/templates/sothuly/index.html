@@ -1,0 +1,62 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--  <title>Sổ Thụ Lý</title>-->
+
+<!--  <link rel="stylesheet"-->
+<!--        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>-->
+
+<!--  <link rel="stylesheet"-->
+<!--        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>-->
+
+<!--  <link rel="stylesheet"-->
+<!--        href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">-->
+<!--  &lt;!&ndash; CSS riêng &ndash;&gt;-->
+<!--  <link rel="stylesheet" th:href="@{/css/sothuly.css}">-->
+<!--</head>-->
+
+<!--<body class="p-4">-->
+
+<!--<div th:replace="fragments/loader :: loader"></div>-->
+
+<!--<h2>SỔ THỤ LÝ KIỂM SÁT THI HÀNH ÁN DÂN SỰ</h2>-->
+
+<!--&lt;!&ndash; HEADER: search + button &ndash;&gt;-->
+<!--<div th:replace="sothuly/header :: header"></div>-->
+
+<!--&lt;!&ndash; TABLE &ndash;&gt;-->
+<!--<div th:replace="sothuly/table :: table"></div>-->
+
+<!--&lt;!&ndash; MODAL &ndash;&gt;-->
+<!--<div th:replace="sothuly/modal :: modal"></div>-->
+
+<!--&lt;!&ndash; AUTH GOOGLE MODAL &ndash;&gt;-->
+<!--<div th:replace="sothuly/auth-modal :: authModal"></div>-->
+
+<!--&lt;!&ndash; LIB JS &ndash;&gt;-->
+<!--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>-->
+
+<!--&lt;!&ndash; JS riêng &ndash;&gt;-->
+<!--<script th:src="@{/js/sothuly.js}"></script>-->
+
+<!--</body>-->
+<!--</html>-->
+<div class="mb-2" th:fragment="content">
+
+  <h2>SỔ THỤ LÝ KIỂM SÁT THI HÀNH ÁN DÂN SỰ</h2>
+
+  <!-- HEADER -->
+  <div th:replace="sothuly/header :: header"></div>
+
+  <!-- TABLE -->
+  <div th:replace="sothuly/table :: table"></div>
+
+  <!-- MODAL -->
+  <div th:replace="sothuly/modal :: modal"></div>
+
+  <!-- AUTH GOOGLE MODAL -->
+<!--  <div th:replace="sothuly/auth-modal :: authModal"></div>-->
+
+</div>
