@@ -1,0 +1,167 @@
+<div th:fragment="modal">
+
+  <div class="modal fade" id="editModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Thêm / Sửa</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <input type="hidden" id="id">
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label>Số TT</label>
+              <input type="text" id="orderNumber" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Ngày TL</label>
+              <input id="sttNgayTl" class="form-control" placeholder="dd-MM-yyyy">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Bản án - Quyết định</label>
+              <input type="text" id="banAnQuyetDinh" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Người phải thi hành</label>
+              <input type="text" id="personWhoMustExecute" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Người được thi hành</label>
+              <input type="text" id="personToBeExecuted" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>QĐ Ủy thác đi</label>
+              <input type="text" id="qdUyThacDi" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>QĐ Ủy thác đến</label>
+              <input type="text" id="qdUyThacDen" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>QĐ THA dân sự</label>
+              <input type="text" id="qdTha" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Nội dung thi hành</label>
+              <input type="text" id="ndThiHanh" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>QĐ chưa có điều kiện</label>
+              <input type="text" id="qdChuaCoDieuKien" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>QĐ rút THA</label>
+              <input type="text" id="qdRutTha" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>QĐ hoãn THA</label>
+              <input type="text" id="qdHoanTha" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>QĐ tiếp tục sau hoãn</label>
+              <input type="text" id="qdTiepTucSauHoan" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>QĐ tạm đình chỉ</label>
+              <input type="text" id="qdTamDinhChi" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>QĐ tiếp tục sau tạm đình chỉ</label>
+              <input type="text" id="qdTiepTucSauTamDinhChi" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>QĐ đình chỉ</label>
+              <input type="text" id="qdDinhChi" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Đã thi hành xong</label>
+              <input type="text" id="daThiHanhXong" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Kiểm sát viên</label>
+              <input type="text" id="ghiChu" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Về thời hạn gửi QĐ</label>
+              <input type="text" id="veThoiHanGuiQD" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Về căn cứ ban hành QĐ</label>
+              <input type="text" id="veCanCuBanHanhQD" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Về thẩm quyền ban hành QĐ</label>
+              <input type="text" id="veThamQuyenBanHanhQD" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Về hình thức của QĐ</label>
+              <input type="text" id="veHinhThucQD" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Về nội dung của QĐ</label>
+              <input type="text" id="veNoiDungQD" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Những nội dung khác</label>
+              <input type="text" id="noiDungKhac" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Mã Phiếu</label>
+              <input type="text" id="maPhieu" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Tên Viện KSND Cấp</label>
+              <input type="text" id="vienKsndCap" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Khu vực</label>
+              <input type="text" id="khuVuc" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label>Quan điểm của KSV</label>
+              <input type="text" id="quanDiemKSV" class="form-control">
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal">Đóng</button>
+
+          <button class="btn btn-primary" onclick="saveItem()">Lưu</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

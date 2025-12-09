@@ -1,10 +1,14 @@
 package com.handler.excel2word.handlerApi.service;
 
+import com.handler.excel2word.core.utils.CommonConstants;
 import com.handler.excel2word.core.utils.DateUtil;
 import com.handler.excel2word.dto.SoThuLyKiemSoatDTO;
-import com.handler.excel2word.handlerApi.entity.SoThuLyKiemSoat;
+import com.handler.excel2word.handlerApi.Interface.SoThuLyKiemSoatRepositoryCustom;
 import com.handler.excel2word.handlerApi.Interface.SoThuLyService;
 import com.handler.excel2word.handlerApi.dto.SoThuLyDTO;
+import com.handler.excel2word.handlerApi.entity.Authority;
+import com.handler.excel2word.handlerApi.entity.SoThuLyKiemSoat;
+import com.handler.excel2word.handlerApi.entity.User;
 import com.handler.excel2word.handlerApi.repository.SoThuLyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +23,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,10 +32,15 @@ import java.util.List;
 public class SoThuLyServiceImpl implements SoThuLyService {
 
     private final SoThuLyRepository repository;
+    private final UserService userService;
+    private final SoThuLyKiemSoatRepositoryCustom soThuLyKiemSoatRepositoryCustom;
 
     @Override
     public SoThuLyKiemSoat create(SoThuLyDTO dto) {
         SoThuLyKiemSoat entity = map(dto);
+        User user = userService.getUserLogin();
+        entity.setUserId(user.getId());
+        entity.setAccount(user.getLogin());
         return repository.save(entity);
     }
 
@@ -51,27 +62,15 @@ public class SoThuLyServiceImpl implements SoThuLyService {
     @Override
     public Page<SoThuLyKiemSoat> queryPage(SoThuLyDTO dto, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-
         Date from = DateUtil.getDateStart(dto.getBeginDate());
         Date to   = DateUtil.getDateEnd(dto.getEndDate());
-
-        // Trường hợp 1: cả from và to đều null → lấy tất cả
-        if (from == null && to == null) {
-            return repository.findAllData(pageable);
+        User user = userService.getUserLogin();
+        Long userId = user.getId();
+        Set<String> roles = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+        if (CollectionUtils.isEmpty(roles) || roles.contains(CommonConstants.ROLE_ADMIN)) {
+            userId = null;
         }
-
-        // Trường hợp 2: chỉ from có
-        if (from != null && to == null) {
-            return repository.findFrom(from, pageable);
-        }
-
-        // Trường hợp 3: chỉ to có
-        if (from == null && to != null) {
-            return repository.findTo(to, pageable);
-        }
-
-        // Trường hợp 4: đủ cả hai
-        return repository.findByRange(from, to, pageable);
+        return soThuLyKiemSoatRepositoryCustom.findByDateRange(from, to, userId, dto.getAccount(), pageable);
     }
 
     @Override
@@ -101,13 +100,16 @@ public class SoThuLyServiceImpl implements SoThuLyService {
     public List<SoThuLyKiemSoatDTO> exportExcel(SoThuLyDTO dto) {
         Date from = DateUtil.getDateStart(dto.getBeginDate());
         Date to   = DateUtil.getDateEnd(dto.getEndDate());
-        List<SoThuLyKiemSoat> list =  queryList(from, to);
+        List<SoThuLyKiemSoat> list =  queryList(from, to, dto.getAccount());
         return convertEntityToDTOs(list);
     }
 
     @Override
     public SoThuLyDTO copyFromId(SoThuLyKiemSoat old) throws InvocationTargetException, IllegalAccessException {
         SoThuLyKiemSoat copy = new SoThuLyKiemSoat();
+        User user = userService.getUserLogin();
+        copy.setUserId(user.getId());
+        copy.setAccount(user.getLogin());
 
         // Copy toàn bộ field TRỪ ID, createdAt, updatedAt
         copy.setOrderNumber(old.getOrderNumber());
@@ -219,6 +221,8 @@ public class SoThuLyServiceImpl implements SoThuLyService {
         dto.setMaPhieu(e.getMaPhieu());
         dto.setVienKsndCap(e.getVienKsndCap());
         dto.setKhuVuc(e.getKhuVuc());
+        dto.setUserId(e.getUserId());
+        dto.setAccount(e.getAccount());
         return dto;
     }
 
@@ -312,21 +316,13 @@ public class SoThuLyServiceImpl implements SoThuLyService {
         e.setKhuVuc(dto.getKhuVuc());
     }
 
-    private List<SoThuLyKiemSoat> queryList(Date from, Date to) {
-        if (from == null && to == null) {
-            return repository.findAllOrder();
+    private List<SoThuLyKiemSoat> queryList(Date from, Date to, String account) {
+        User user = userService.getUserLogin();
+        Long userId = user.getId();
+        Set<String> roles = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+        if (CollectionUtils.isEmpty(roles) || roles.contains(CommonConstants.ROLE_ADMIN)) {
+            userId = null;
         }
-
-        // 2) Chỉ có from
-        if (from != null && to == null) {
-            return repository.findFrom(from);
-        }
-
-        // 3) Chỉ có to
-        if (from == null && to != null) {
-            return repository.findTo(to);
-        }
-
-        return repository.findRange(from, to);
+        return soThuLyKiemSoatRepositoryCustom.findByDateRange(from, to, userId, account);
     }
 }
