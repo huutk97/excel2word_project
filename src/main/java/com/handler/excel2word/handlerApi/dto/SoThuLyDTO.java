@@ -47,6 +47,8 @@ public class SoThuLyDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
     private Date createdAt;
+    private Long userId;
+    private String account;
 
     private String veThoiHanGuiQD;
     private String veCanCuBanHanhQD;

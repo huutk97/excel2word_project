@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+
+  <!-- ================= CSS ================= -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"/>
+
+  <!-- FONT AWESOME (nếu dùng icon) -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
+  <!-- FLATPICKR (dùng cho sổ thụ lý) -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
+
+  <!-- MODULE CSS -->
+  <link rel="stylesheet" th:href="@{/css/sothuly.css}"/>
+  <link rel="stylesheet" th:href="@{/css/home.css}"/>
+</head>
+
+<body>
+
+<!-- ===== LOADER ===== -->
+<div th:replace="fragments/loader :: loader"></div>
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+
+    <a class="navbar-brand fw-bold" href="#">SYSTEM</a>
+
+    <!-- TAB MENU -->
+    <ul class="navbar-nav me-auto nav nav-tabs border-0" role="tablist">
+
+      <!-- USER (ADMIN) -->
+      <li class="nav-item d-none" id="menuUser" role="presentation">
+        <button class="nav-link"
+                id="tabUserBtn"
+                data-bs-toggle="tab"
+                data-bs-target="#tabUser"
+                type="button"
+                role="tab">
+          👤 User
+        </button>
+      </li>
+
+      <!-- SỔ THỤ LÝ -->
+      <li class="nav-item d-none" id="menuSoThuLy" role="presentation">
+        <button class="nav-link active"
+                id="tabSoThuLyBtn"
+                data-bs-toggle="tab"
+                data-bs-target="#tabSoThuLy"
+                type="button"
+                role="tab">
+          📘 SỔ THỤ LÝ
+        </button>
+      </li>
+    </ul>
+
+    <select id="accountAction"
+            class="form-select form-select-sm bg-dark text-light border-light"
+            style="width:160px"
+            onchange="handleAccountAction(this)">
+      <option id="accountName" selected disabled>👤 Account</option>
+      <option value="reset">🔑 Reset Password</option>
+      <option value="logout">🚪 Logout</option>
+    </select>
+  </div>
+</nav>
+
+<!-- ================= TAB CONTENT ================= -->
+<div class="container-fluid mt-3">
+
+  <div class="tab-content">
+
+    <!-- ===== TAB USER ===== -->
+    <div class="tab-pane fade"
+         id="tabUser"
+         role="tabpanel"
+         aria-labelledby="tabUserBtn">
+
+      <!-- USER COMPONENT -->
+      <div th:replace="user/index :: content"></div>
+
+    </div>
+
+    <!-- ===== TAB SỔ THỤ LÝ ===== -->
+    <div class="tab-pane fade show active"
+         id="tabSoThuLy"
+         role="tabpanel"
+         aria-labelledby="tabSoThuLyBtn">
+
+      <!-- SỔ THỤ LÝ COMPONENT -->
+      <div th:replace="sothuly/index :: content"></div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ================= RESET PASSWORD MODAL ================= -->
+<div th:replace="fragments/reset-password-modal :: resetPasswordModal"></div>
+
+<!-- ================= JS ================= -->
+
+<!-- Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Flatpickr -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- MODULE JS -->
+<script th:src="@{/js/home.js}"></script>
+<script th:src="@{/js/sothuly.js}"></script>
+<script th:src="@{/js/loader.js}"></script>
+<!--<script th:src="@{/js/user.js}"></script>-->
+
+</body>
+</html>
