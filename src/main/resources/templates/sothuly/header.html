@@ -1,0 +1,34 @@
+<div th:fragment="header">
+  <div class="d-flex gap-3 mb-3 align-items-end">
+
+    <button class="btn btn-danger" onclick="deleteMultiple()">Xóa nhiều</button>
+
+    <button class="btn btn-info" onclick="searchData()">
+      <i class="fa fa-search"></i> Tìm
+    </button>
+
+    <!-- SEARCH ACCOUNT -->
+    <div class="d-flex align-items-center gap-2">
+      <label class="form-label mb-0">Tài khoản</label>
+      <input id="searchAccount"
+             class="form-control"
+             style="width:160px;"
+             placeholder="Nhập account">
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <label class="form-label mb-0">Từ ngày</label>
+      <input id="searchFrom" class="form-control" style="width:150px;" placeholder="dd-MM-yyyy">
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <label class="form-label mb-0">Đến ngày</label>
+      <input id="searchTo" class="form-control" style="width:150px;" placeholder="dd-MM-yyyy">
+    </div>
+
+    <div class="d-flex gap-2 ms-auto">
+      <button class="btn btn-primary" onclick="openCreateModal()">+ Thêm mới</button>
+      <button class="btn btn-success" onclick="exportExcel()">Export Excel</button>
+    </div>
+  </div>
+</div>

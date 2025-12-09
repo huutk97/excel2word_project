@@ -1,0 +1,96 @@
+<div th:fragment="modal">
+
+  <div class="modal fade"
+       id="userModal"
+       tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title"
+              id="userModalTitle">
+            User
+          </h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <input type="hidden" id="userId">
+
+          <div class="mb-2">
+            <label class="form-label">Login</label>
+            <input type="text"
+                   id="userLogin"
+                   class="form-control"
+                   required>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Password</label>
+            <input type="password"
+                   id="userPassword"
+                   class="form-control"
+                   placeholder="Enter password">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">First name</label>
+            <input type="text"
+                   id="userFirstName"
+                   class="form-control">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Last name</label>
+            <input type="text"
+                   id="userLastName"
+                   class="form-control">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Area</label>
+            <input type="text"
+                   id="userArea"
+                   class="form-control">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Roles</label>
+
+            <div class="form-check">
+              <input class="form-check-input"
+                     type="checkbox"
+                     id="userRoleAdmin">
+              <label class="form-check-label">ADMIN</label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input"
+                     type="checkbox"
+                     id="userRoleUser">
+              <label class="form-check-label">USER</label>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm"
+                  data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button class="btn btn-success btn-sm"
+                  onclick="userSave()">
+            Save
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

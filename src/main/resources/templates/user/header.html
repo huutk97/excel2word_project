@@ -1,0 +1,25 @@
+<div th:fragment="header"
+     class="d-flex justify-content-between align-items-center mb-3">
+
+  <h2>User Management</h2>
+
+  <div class="d-flex gap-2 align-items-center">
+
+    <input type="text"
+           id="userSearchInput"
+           class="form-control form-control-sm"
+           placeholder="Search user"
+           style="width:240px">
+
+    <button class="btn btn-outline-primary btn-sm"
+            onclick="userSearch()">
+      Search
+    </button>
+
+    <button class="btn btn-primary btn-sm"
+            onclick="userOpenCreate()">
+      + Add User
+    </button>
+
+  </div>
+</div>
