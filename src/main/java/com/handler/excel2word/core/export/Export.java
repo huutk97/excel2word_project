@@ -1,14 +1,18 @@
 package com.handler.excel2word.core.export;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.handler.excel2word.core.utils.DateUtil;
 import com.handler.excel2word.core.utils.LogUtil;
 import com.handler.excel2word.dto.SoThuLyKiemSoatDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.*;
 
 import java.lang.reflect.*;
 
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.*;
 import org.apache.poi.xssf.streaming.*;
 import org.apache.poi.ss.usermodel.*;
@@ -18,8 +22,8 @@ import java.util.*;
 
 import java.io.*;
 
+@Slf4j
 public class Export {
-    private static final Logger logger;
     private static final Map<Class<?>, List<Field>> exportFieldsCache;
     private static final Map<Class<?>, Map<Field, Method>> exportCustTextFields;
 
@@ -47,7 +51,7 @@ public class Export {
                 try {
                     custTextFields.put(field, clazz.getMethod(column.textMethod(), (Class<?>[]) new Class[0]));
                 } catch (Exception e) {
-                    Export.logger.error((clazz.getName() + " get method [ " + column.textMethod() + " ] occurred Exception\uff1a" + e.toString()));
+                    Export.log.error((clazz.getName() + " get method [ " + column.textMethod() + " ] occurred Exception\uff1a" + e.toString()));
                     throw e;
                 }
             }
@@ -62,250 +66,287 @@ public class Export {
     }
 
     public static void exportPoi2(final Collection<?> dataList,
-                                 final Class<?> clazz,
-                                 final OutputStream outStream,
+                                  final Class<?> clazz,
+                                  final OutputStream outStream,
                                   final InputStream inputstream,
-                                 final String sheetName) {
+                                  final String sheetName) {
 
-        SXSSFWorkbook workBook = null;
+        Assert.assertNotNull(clazz);
+        Assert.assertNotNull(outStream);
+
+        // workbook sẽ là SXSSFWorkbook để ghi streaming
+        SXSSFWorkbook sxWorkbook = null;
+        Workbook templateWorkbook = null; // chỉ để đóng nếu dùng template
+
         try {
-            Assert.assertNotNull(clazz);
-            Assert.assertNotNull(outStream);
-
             Sheet sheet;
             int rowIndex = 0;
-            Row xRow;
 
-            // Nếu có template
             if (inputstream != null) {
-                // Tạm thời giữ nguyên logic cũ của bạn:
-                workBook = new SXSSFWorkbook();
-                sheet = workBook.getSheetAt(0);
-                xRow = sheet.getRow(rowIndex++);
+                // Mở workbook từ template, sau đó bọc bằng SXSSFWorkbook (streaming)
+                templateWorkbook = WorkbookFactory.create(inputstream);
+                // Convert template Workbook -> SXSSFWorkbook
+                sxWorkbook = new SXSSFWorkbook((XSSFWorkbook) templateWorkbook);
+                // Lấy sheet đầu tiên (có sẵn trong template)
+                sheet = sxWorkbook.getSheetAt(0);
+                // Nếu muốn giữ rowIndex từ template, có thể detect lastRowNum
+                rowIndex = sheet.getLastRowNum() + 1;
             } else {
-                workBook = new SXSSFWorkbook();
-                sheet = workBook.createSheet(sheetName);
+                sxWorkbook = new SXSSFWorkbook();
+                // tên sheet an toàn
+                String safeName = WorkbookUtil.createSafeSheetName(sheetName == null ? "Sheet1" : sheetName);
+                sheet = sxWorkbook.createSheet(safeName);
+                rowIndex = 0;
             }
 
-            // Freeze panes: 2 dòng header
-            sheet.createFreezePane(1, 2);
+            // Freeze panes: 2 dòng header (colSplit, rowSplit)
+            sheet.createFreezePane(0, 2);
 
             // -------- STYLE CHUNG --------
-            final CellStyle cellStyle = workBook.createCellStyle();
-            cellStyle.setBorderBottom((short) 1);
-            cellStyle.setBorderTop((short) 1);
-            cellStyle.setBorderLeft((short) 1);
-            cellStyle.setBorderRight((short) 1);
-            cellStyle.setAlignment((short) 2);          // center
-            cellStyle.setVerticalAlignment((short) 1);  // center
+            final CellStyle cellStyle = sxWorkbook.createCellStyle();
+            cellStyle.setBorderBottom(BorderStyle.THIN);
+            cellStyle.setBorderTop(BorderStyle.THIN);
+            cellStyle.setBorderLeft(BorderStyle.THIN);
+            cellStyle.setBorderRight(BorderStyle.THIN);
+            cellStyle.setAlignment(HorizontalAlignment.CENTER);
+            cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             cellStyle.setWrapText(true);
 
-            final Font titleFont = workBook.createFont();
-            titleFont.setBoldweight((short) 400);
-            titleFont.setFontName("Times New Roman");     // FONT
-            titleFont.setFontHeightInPoints((short) 12);  // SIZE
+            final Font titleFont = sxWorkbook.createFont();
+            titleFont.setBold(false); // nếu muốn normal
+            titleFont.setFontName("Times New Roman");
+            titleFont.setFontHeightInPoints((short) 12);
             cellStyle.setFont(titleFont);
 
-            final CellStyle titleStyle = workBook.createCellStyle();
+            final CellStyle titleStyle = sxWorkbook.createCellStyle();
             titleStyle.cloneStyleFrom(cellStyle);
 
-            final Font font = workBook.createFont();
-            font.setBoldweight((short) 400); // BOLD (POI 3.x)
-            titleStyle.setFont(font);
-            titleStyle.setFillForegroundColor((short) 11);
-            titleStyle.setFillPattern((short) 1); // CellStyle.SOLID_FOREGROUND = 1
+            final Font headerFont = sxWorkbook.createFont();
+            headerFont.setBold(true); // tiêu đề in đậm
+            headerFont.setFontName("Times New Roman");
+            headerFont.setFontHeightInPoints((short) 12);
+            titleStyle.setFont(headerFont);
 
-            final List<Field> expFields = getClassExportFields(clazz);
-            final Map<Field, Method> expCustTextFields = Export.exportCustTextFields.get(clazz);
+            // set background màu xám nhạt cho header
+            titleStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-            Cell cell;
-            int cellIndex = 0;
+            // Gọi hàm writeData của bạn (giữ nguyên) - giả định phương thức tồn tại
+            writeData(clazz, dataList, sheet, rowIndex, titleStyle, cellStyle);
 
-            // ===================== HEADER =====================
-            // Nếu là SoThuLyKiemSoatDTO -> header 2 dòng + merge giống HTML
-            if (SoThuLyKiemSoatDTO.class.equals(clazz)) {
+            // Ghi workbook ra OutputStream
+            sxWorkbook.write(outStream);
+            outStream.flush();
 
-                // tạo 2 dòng header
-                Row headerRow1 = sheet.createRow(rowIndex++);
-                Row headerRow2 = sheet.createRow(rowIndex++);
-
-                // set width theo ExcelColumn
-                for (Field f : expFields) {
-                    ExcelColumn ann = f.getAnnotation(ExcelColumn.class);
-                    if (ann != null) {
-                        sheet.setColumnWidth(ann.index(), ann.width() * 256);
-                    }
+        } catch (InvalidFormatException ife) {
+            LogUtil.error("InvalidFormatException: " + ife.getMessage());
+        } catch (Exception e) {
+            LogUtil.error("Export error: " + e.toString());
+        } finally {
+            // Đóng workbook / template
+            try {
+                if (sxWorkbook != null) {
+                    sxWorkbook.dispose(); // giải phóng temp files của SXSSFWorkbook
+                    sxWorkbook.close();
                 }
-
-                // 1) Các cột rowspan (A đến I) = 9 cột (index 0..8)
-                String[] rowspanHeaders = new String[] {
-                        "Ngày TL",
-                        "Bản án, Quyết định\n(Số; Ngày, tháng, năm; Cơ quan ban hành)",
-                        "Người phải thi hành\n(tên địa chỉ)",
-                        "Người được thi hành\n(tên địa chỉ)",
-                        "QĐ Ủy thác đi\n(Số; Ngày, tháng, năm; Số tiền; Nơi BH)",
-                        "QĐ Ủy thác đến\n(Số; Ngày, tháng, năm; Số tiền; Nơi BH)",
-                        "QĐ thi hành án dân sự\n(Số; Ngày, tháng, năm; Số tiền)",
-                        "Nội dung thi hành\n( Các khoản phải thi hành, số tiền)",
-                        "QĐ về việc chưa có điều kiện thi hành án dân sự\n(Số; Ngày, tháng, năm; Số tiền)",
-                        "QĐ rút Quyết định THA\n(Số; Ngày, tháng, năm; Số tiền)"
-                };
-
-                cellIndex = 0;
-                for (String title : rowspanHeaders) {
-                    cell = headerRow1.createCell(cellIndex);
-                    cell.setCellStyle(titleStyle);
-                    cell.setCellValue(title);
-
-                    // merge row 0..1 cho cột này
-                    sheet.addMergedRegion(
-                            new org.apache.poi.ss.util.CellRangeAddress(
-                                    headerRow1.getRowNum(), headerRow2.getRowNum(),
-                                    cellIndex, cellIndex
-                            )
-                    );
-                    cellIndex++;
+                if (templateWorkbook != null) {
+                    templateWorkbook.close();
                 }
+            } catch (IOException ioe) {
+                LogUtil.error("Close workbook error: " + ioe.toString());
+            }
 
-                // 2) Nhóm "QĐ hoãn thi hành án Dân sự" (colspan 2)
-                int startColHoan = cellIndex; // 9
-                cell = headerRow1.createCell(startColHoan);
-                cell.setCellStyle(titleStyle);
-                cell.setCellValue("QĐ hoãn thi hành án Dân sự");
-                // merge 1 ô trên: row1, col 9..10
-                sheet.addMergedRegion(
-                        new org.apache.poi.ss.util.CellRangeAddress(
-                                headerRow1.getRowNum(), headerRow1.getRowNum(),
-                                startColHoan, startColHoan + 1
-                        )
-                );
+            // Đóng outStream nếu cần (nếu caller muốn tự quản lý thì bỏ dòng này)
+            try {
+                outStream.close();
+            } catch (IOException e) {
+                LogUtil.error(e.toString());
+            }
+        }
+    }
 
-                // dòng 2: 2 ô con
-                cell = headerRow2.createCell(startColHoan);
-                cell.setCellStyle(titleStyle);
-                cell.setCellValue("Số; Ngày, tháng, năm; Lý do; Số tiền");
+    private static void writeData(final Class<?> clazz, final Collection<?> dataList,
+                                  final Sheet sheet, int rowIndex,
+                                  CellStyle titleStyle, CellStyle cellStyle) throws Exception {
+        final List<Field> expFields = getClassExportFields(clazz);
+        final Map<Field, Method> expCustTextFields = Export.exportCustTextFields.get(clazz);
 
-                cell = headerRow2.createCell(startColHoan + 1);
-                cell.setCellStyle(titleStyle);
-                cell.setCellValue("QĐ tiếp tục THA\n(Số; Ngày, tháng, năm)");
+        Cell cell;
+        int cellIndex = 0;
 
-                cellIndex = startColHoan + 2; // 11
+        // ===================== HEADER =====================
+        // Nếu là SoThuLyKiemSoatDTO -> header 2 dòng + merge giống HTML
+        if (SoThuLyKiemSoatDTO.class.equals(clazz)) {
 
-                // 3) Nhóm "QĐ tạm đình chỉ thi hành án dân sự" (colspan 2)
-                int startColTamDinhChi = cellIndex; // 11
-                cell = headerRow1.createCell(startColTamDinhChi);
-                cell.setCellStyle(titleStyle);
-                cell.setCellValue("QĐ tạm đình chỉ thi hành án dân sự");
-                sheet.addMergedRegion(
-                        new org.apache.poi.ss.util.CellRangeAddress(
-                                headerRow1.getRowNum(), headerRow1.getRowNum(),
-                                startColTamDinhChi, startColTamDinhChi + 1
-                        )
-                );
+            // tạo 2 dòng header
+            Row headerRow1 = sheet.createRow(rowIndex++);
+            Row headerRow2 = sheet.createRow(rowIndex++);
 
-                cell = headerRow2.createCell(startColTamDinhChi);
-                cell.setCellStyle(titleStyle);
-                cell.setCellValue("Số; Ngày, tháng, năm; Lý do; Số tiền");
-
-                cell = headerRow2.createCell(startColTamDinhChi + 1);
-                cell.setCellStyle(titleStyle);
-                cell.setCellValue("QĐ tiếp tục THA\n(Số; Ngày, tháng, năm)");
-
-                cellIndex = startColTamDinhChi + 2; // 13
-
-                // 4) Các cột rowspan cuối: O, P, Q (index 13..15)
-                String[] lastHeaders = new String[] {
-                        "QĐ đình chỉ thi hành án dân sự\n(Số; Ngày, tháng, năm; Số tiền)",
-                        "Đã thi hành xong\n(Số; Ngày, tháng, năm; Số tiền)",
-                        "Ghi chú\n(Ghi các thông tin như tên chấp hành viên; Vi phạm..)",
-                        "Về thời hạn gửi Quyết định",
-                        "Về căn cứ ban hành Quyết định",
-                        "Về thẩm quyền ban hành Quyết định",
-                        "Về hình thức của Quyết định",
-                        "Về nội dung của Quyết định",
-                        "Những nội dung khác",
-                        "Quan điểm của KSV"
-                };
-
-                for (String title : lastHeaders) {
-                    cell = headerRow1.createCell(cellIndex);
-                    cell.setCellStyle(titleStyle);
-                    cell.setCellValue(title);
-
-                    sheet.addMergedRegion(
-                            new org.apache.poi.ss.util.CellRangeAddress(
-                                    headerRow1.getRowNum(), headerRow2.getRowNum(),
-                                    cellIndex, cellIndex
-                            )
-                    );
-                    cellIndex++;
-                }
-
-            } else {
-                // ===================== HEADER MẶC ĐỊNH (CHO CLASS KHÁC) =====================
-                Row headerRow = sheet.createRow(rowIndex++);
-
-                for (final Field field : expFields) {
-                    ExcelColumn ann = field.getAnnotation(ExcelColumn.class);
-                    if (ann == null) continue;
-
-                    sheet.setColumnWidth(cellIndex, ann.width() * 256);
-                    cell = headerRow.createCell(cellIndex++);
-                    cell.setCellStyle(titleStyle);
-                    cell.setCellValue(ann.name());
+            // set width theo ExcelColumn
+            for (Field f : expFields) {
+                ExcelColumn ann = f.getAnnotation(ExcelColumn.class);
+                if (ann != null) {
+                    sheet.setColumnWidth(ann.index(), ann.width() * 256);
                 }
             }
 
-            // ===================== GHI DATA =====================
-            if (CollectionUtils.isNotEmpty((Collection) dataList)) {
-                try {
-                    for (final Object vo : dataList) {
-                        Row dataRow = sheet.createRow(rowIndex++);
-                        cellIndex = 0;
+            // 1) Các cột rowspan (A đến I) = 9 cột (index 0..8)
+            String[] rowspanHeaders = new String[] {
+                    "Ngày TL",
+                    "Bản án, Quyết định\n(Số; Ngày, tháng, năm; Cơ quan ban hành)",
+                    "Người phải thi hành\n(tên địa chỉ)",
+                    "Người được thi hành\n(tên địa chỉ)",
+                    "QĐ Ủy thác đi\n(Số; Ngày, tháng, năm; Số tiền; Nơi BH)",
+                    "QĐ Ủy thác đến\n(Số; Ngày, tháng, năm; Số tiền; Nơi BH)",
+                    "QĐ thi hành án dân sự\n(Số; Ngày, tháng, năm; Số tiền)",
+                    "Nội dung thi hành\n( Các khoản phải thi hành, số tiền)",
+                    "QĐ về việc chưa có điều kiện thi hành án dân sự\n(Số; Ngày, tháng, năm; Số tiền)",
+                    "QĐ rút Quyết định THA\n(Số; Ngày, tháng, năm; Số tiền)"
+            };
 
-                        for (final Field field2 : expFields) {
-                            ExcelColumn ann = field2.getAnnotation(ExcelColumn.class);
-                            if (ann == null) continue;
+            cellIndex = 0;
+            for (String title : rowspanHeaders) {
+                cell = headerRow1.createCell(cellIndex);
+                cell.setCellStyle(titleStyle);
+                cell.setCellValue(title);
 
-                            Object fieldVal;
-                            if (expCustTextFields != null && expCustTextFields.get(field2) != null) {
-                                try {
-                                    fieldVal = expCustTextFields.get(field2).invoke(vo);
-                                } catch (Exception e5) {
-                                    fieldVal = "DỮ LIỆU LỖI";
-                                }
-                            } else {
-                                field2.setAccessible(true);
-                                fieldVal = field2.get(vo);
+                // merge row 0..1 cho cột này
+                sheet.addMergedRegion(
+                        new org.apache.poi.ss.util.CellRangeAddress(
+                                headerRow1.getRowNum(), headerRow2.getRowNum(),
+                                cellIndex, cellIndex
+                        )
+                );
+                cellIndex++;
+            }
+
+            // 2) Nhóm "QĐ hoãn thi hành án Dân sự" (colspan 2)
+            int startColHoan = cellIndex; // 9
+            cell = headerRow1.createCell(startColHoan);
+            cell.setCellStyle(titleStyle);
+            cell.setCellValue("QĐ hoãn thi hành án Dân sự");
+            // merge 1 ô trên: row1, col 9..10
+            sheet.addMergedRegion(
+                    new org.apache.poi.ss.util.CellRangeAddress(
+                            headerRow1.getRowNum(), headerRow1.getRowNum(),
+                            startColHoan, startColHoan + 1
+                    )
+            );
+
+            // dòng 2: 2 ô con
+            cell = headerRow2.createCell(startColHoan);
+            cell.setCellStyle(titleStyle);
+            cell.setCellValue("Số; Ngày, tháng, năm; Lý do; Số tiền");
+
+            cell = headerRow2.createCell(startColHoan + 1);
+            cell.setCellStyle(titleStyle);
+            cell.setCellValue("QĐ tiếp tục THA\n(Số; Ngày, tháng, năm)");
+
+            cellIndex = startColHoan + 2; // 11
+
+            // 3) Nhóm "QĐ tạm đình chỉ thi hành án dân sự" (colspan 2)
+            int startColTamDinhChi = cellIndex; // 11
+            cell = headerRow1.createCell(startColTamDinhChi);
+            cell.setCellStyle(titleStyle);
+            cell.setCellValue("QĐ tạm đình chỉ thi hành án dân sự");
+            sheet.addMergedRegion(
+                    new org.apache.poi.ss.util.CellRangeAddress(
+                            headerRow1.getRowNum(), headerRow1.getRowNum(),
+                            startColTamDinhChi, startColTamDinhChi + 1
+                    )
+            );
+
+            cell = headerRow2.createCell(startColTamDinhChi);
+            cell.setCellStyle(titleStyle);
+            cell.setCellValue("Số; Ngày, tháng, năm; Lý do; Số tiền");
+
+            cell = headerRow2.createCell(startColTamDinhChi + 1);
+            cell.setCellStyle(titleStyle);
+            cell.setCellValue("QĐ tiếp tục THA\n(Số; Ngày, tháng, năm)");
+
+            cellIndex = startColTamDinhChi + 2; // 13
+
+            // 4) Các cột rowspan cuối: O, P, Q (index 13..15)
+            String[] lastHeaders = new String[] {
+                    "QĐ đình chỉ thi hành án dân sự\n(Số; Ngày, tháng, năm; Số tiền)",
+                    "Đã thi hành xong\n(Số; Ngày, tháng, năm; Số tiền)",
+                    "Ghi chú\n(Ghi các thông tin như tên chấp hành viên; Vi phạm..)",
+                    "Về thời hạn gửi Quyết định",
+                    "Về căn cứ ban hành Quyết định",
+                    "Về thẩm quyền ban hành Quyết định",
+                    "Về hình thức của Quyết định",
+                    "Về nội dung của Quyết định",
+                    "Những nội dung khác",
+                    "Quan điểm của KSV"
+            };
+
+            for (String title : lastHeaders) {
+                cell = headerRow1.createCell(cellIndex);
+                cell.setCellStyle(titleStyle);
+                cell.setCellValue(title);
+
+                sheet.addMergedRegion(
+                        new org.apache.poi.ss.util.CellRangeAddress(
+                                headerRow1.getRowNum(), headerRow2.getRowNum(),
+                                cellIndex, cellIndex
+                        )
+                );
+                cellIndex++;
+            }
+
+        } else {
+            // ===================== HEADER MẶC ĐỊNH (CHO CLASS KHÁC) =====================
+            Row headerRow = sheet.createRow(rowIndex++);
+
+            for (final Field field : expFields) {
+                ExcelColumn ann = field.getAnnotation(ExcelColumn.class);
+                if (ann == null) continue;
+
+                sheet.setColumnWidth(cellIndex, ann.width() * 256);
+                cell = headerRow.createCell(cellIndex++);
+                cell.setCellStyle(titleStyle);
+                cell.setCellValue(ann.name());
+            }
+        }
+
+        // ===================== GHI DATA =====================
+        if (CollectionUtils.isNotEmpty((Collection) dataList)) {
+            try {
+                for (final Object vo : dataList) {
+                    Row dataRow = sheet.createRow(rowIndex++);
+                    cellIndex = 0;
+
+                    for (final Field field2 : expFields) {
+                        ExcelColumn ann = field2.getAnnotation(ExcelColumn.class);
+                        if (ann == null) continue;
+
+                        Object fieldVal;
+                        if (expCustTextFields != null && expCustTextFields.get(field2) != null) {
+                            try {
+                                fieldVal = expCustTextFields.get(field2).invoke(vo);
+                            } catch (Exception e5) {
+                                fieldVal = "DỮ LIỆU LỖI";
                             }
+                        } else {
+                            field2.setAccessible(true);
+                            fieldVal = field2.get(vo);
+                        }
 
-                            cell = dataRow.createCell(cellIndex++);
-                            cell.setCellStyle(cellStyle);
+                        cell = dataRow.createCell(cellIndex++);
+                        cell.setCellStyle(cellStyle);
 
-                            if (isNumberType(field2.getType()) &&
-                                    (fieldVal == null || fieldVal instanceof Number)) {
-                                cell.setCellType(0);
-                                cell.setCellValue((double) getNumberValue(fieldVal));
-                            } else {
-                                cell.setCellValue(getStringValue(fieldVal));
-                            }
+                        if (isNumberType(field2.getType()) &&
+                                (fieldVal == null || fieldVal instanceof Number)) {
+                            cell.setCellType(CellType.NUMERIC);
+                            cell.setCellValue((double) getNumberValue(fieldVal));
+                        } else {
+                            cell.setCellValue(getStringValue(fieldVal));
                         }
                     }
-                } catch (Exception e) {
-                    sheet.createRow(rowIndex++).createCell(0).setCellValue(e.toString());
-                    LogUtil.error(e.toString());
                 }
-            }
-
-            workBook.write(outStream);
-        } catch (Exception e2) {
-            LogUtil.error(e2.toString());
-        } finally {
-            try {
-                outStream.flush();
-                outStream.close();
-            } catch (IOException e3) {
-                LogUtil.error(e3.toString());
+            } catch (Exception e) {
+                sheet.createRow(rowIndex++).createCell(0).setCellValue(e.toString());
+                LogUtil.error(e.toString());
             }
         }
     }
@@ -324,232 +365,6 @@ public class Export {
         Cell cell = row.createCell(col);
         cell.setCellValue(text);
         cell.setCellStyle(style);
-    }
-
-    public static void exportPoi(final Collection<?> dataList, final Class<?> clazz, final OutputStream outStream, final InputStream inputstream, final String sheetName) {
-        try {
-            Assert.assertNotNull(clazz);
-            Assert.assertNotNull(outStream);
-            SXSSFWorkbook workBook = null;
-            Sheet sheet = null;
-            int rowIndex = 0;
-            Row xRow = null;
-            if (inputstream != null) {
-                workBook = new SXSSFWorkbook();
-                sheet = workBook.getSheetAt(0);
-                xRow = sheet.getRow(rowIndex++);
-            } else {
-                workBook = new SXSSFWorkbook();
-                sheet = workBook.createSheet(sheetName);
-                xRow = sheet.createRow(rowIndex++);
-            }
-            sheet.createFreezePane(1, 1);
-            final CellStyle cellStyle = workBook.createCellStyle();
-            cellStyle.setBorderBottom((short) 1);
-            cellStyle.setBorderTop((short) 1);
-            cellStyle.setBorderLeft((short) 1);
-            cellStyle.setBorderRight((short) 1);
-            cellStyle.setAlignment((short) 2);
-            cellStyle.setVerticalAlignment((short) 1);
-            cellStyle.setWrapText(true);
-            final CellStyle titleStyle = workBook.createCellStyle();
-            titleStyle.cloneStyleFrom(cellStyle);
-            final Font font = workBook.createFont();
-            font.setBoldweight((short) 700);
-            titleStyle.setFont(font);
-            titleStyle.setFillForegroundColor((short) 11);
-            titleStyle.setFillPattern((short) 1);
-            final List<Field> expFields = getClassExportFields(clazz);
-            final Map<Field, Method> expCustTextFields = Export.exportCustTextFields.get(clazz);
-            Cell cell = null;
-            int cellIndex = 0;
-            for (final Field field : expFields) {
-                if (field.getAnnotation(ExcelColumn.class).isJavaBean()) {
-                    for (final Field subField : getClassExportFields(field.getType())) {
-                        sheet.setColumnWidth(cellIndex, subField.getAnnotation(ExcelColumn.class).width() * 256);
-                        cell = xRow.createCell(cellIndex++);
-                        cell.setCellStyle(titleStyle);
-                        cell.setCellValue(field.getAnnotation(ExcelColumn.class).name() + subField.getAnnotation(ExcelColumn.class).name());
-                    }
-                } else {
-                    sheet.setColumnWidth(cellIndex, field.getAnnotation(ExcelColumn.class).width() * 256);
-                    cell = xRow.createCell(cellIndex++);
-                    cell.setCellStyle(titleStyle);
-                    cell.setCellValue(field.getAnnotation(ExcelColumn.class).name());
-                }
-            }
-            if (CollectionUtils.isNotEmpty((Collection) dataList)) {
-                try {
-                    for (final Object vo : dataList) {
-                        xRow = sheet.createRow(rowIndex++);
-                        cellIndex = 0;
-                        for (final Field field2 : expFields) {
-                            Object fieldVal;
-                            if (expCustTextFields.get(field2) != null) {
-                                try {
-                                    fieldVal = expCustTextFields.get(field2).invoke(vo, new Object[0]);
-                                } catch (Exception e5) {
-                                    fieldVal = "\u975e\u6b63\u5e38\u5165\u6b3e";
-                                }
-                            } else {
-                                fieldVal = field2.get(vo);
-                            }
-                            if (field2.getAnnotation(ExcelColumn.class).isJavaBean()) {
-                                for (final Field subField2 : getClassExportFields(field2.getType())) {
-                                    cell = xRow.createCell(cellIndex++);
-                                    cell.setCellStyle(cellStyle);
-                                    final Object subFieldValue = subField2.get(fieldVal);
-                                    if (isNumberType(subField2.getType()) && (subFieldValue == null || subFieldValue instanceof Number)) {
-                                        cell.setCellType(0);
-                                        cell.setCellValue((double) getNumberValue(subFieldValue));
-                                    } else {
-                                        cell.setCellValue(getStringValue(subFieldValue));
-                                    }
-                                }
-                            } else {
-                                cell = xRow.createCell(cellIndex++);
-                                cell.setCellStyle(cellStyle);
-                                if (isNumberType(field2.getType()) && (fieldVal == null || fieldVal instanceof Number)) {
-                                    cell.setCellType(0);
-                                    cell.setCellValue((double) getNumberValue(fieldVal));
-                                } else {
-                                    cell.setCellValue(getStringValue(fieldVal));
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    sheet.createRow(rowIndex++).createCell(0).setCellValue(e.toString());
-                    LogUtil.error(e.toString());
-                }
-            }
-            workBook.write(outStream);
-        } catch (Exception e2) {
-            LogUtil.error(e2.toString());
-            try {
-                outStream.flush();
-                outStream.close();
-            } catch (IOException e3) {
-                LogUtil.error(e3.toString());
-            }
-        } finally {
-            try {
-                outStream.flush();
-                outStream.close();
-            } catch (IOException e4) {
-                LogUtil.error(e4.toString());
-            }
-        }
-    }
-
-    public static void exportPoi(final SXSSFWorkbook workBook, final Collection<?> dataList, final Class<?> clazz, final OutputStream outStream, final String sheetName, final int sheetNum) {
-        try {
-            Assert.assertNotNull(clazz);
-            Assert.assertNotNull(outStream);
-            Sheet sheet = null;
-            int rowIndex = 0;
-            Row xRow = null;
-            sheet = workBook.createSheet();
-            workBook.setSheetName(sheetNum, sheetName);
-            xRow = sheet.createRow(rowIndex++);
-            sheet.createFreezePane(1, 1);
-            final CellStyle cellStyle = workBook.createCellStyle();
-            cellStyle.setBorderBottom((short) 1);
-            cellStyle.setBorderTop((short) 1);
-            cellStyle.setBorderLeft((short) 1);
-            cellStyle.setBorderRight((short) 1);
-            cellStyle.setAlignment((short) 2);
-            cellStyle.setVerticalAlignment((short) 1);
-            cellStyle.setWrapText(true);
-            final CellStyle titleStyle = workBook.createCellStyle();
-            titleStyle.cloneStyleFrom(cellStyle);
-            final Font font = workBook.createFont();
-            font.setBoldweight((short) 700);
-            titleStyle.setFont(font);
-            titleStyle.setFillForegroundColor((short) 11);
-            titleStyle.setFillPattern((short) 1);
-            final List<Field> expFields = getClassExportFields(clazz);
-            final Map<Field, Method> expCustTextFields = Export.exportCustTextFields.get(clazz);
-            Cell cell = null;
-            int cellIndex = 0;
-            for (final Field field : expFields) {
-                if (field.getAnnotation(ExcelColumn.class).isJavaBean()) {
-                    for (final Field subField : getClassExportFields(field.getType())) {
-                        sheet.setColumnWidth(cellIndex, subField.getAnnotation(ExcelColumn.class).width() * 256);
-                        cell = xRow.createCell(cellIndex++);
-                        cell.setCellStyle(titleStyle);
-                        cell.setCellValue(field.getAnnotation(ExcelColumn.class).name() + subField.getAnnotation(ExcelColumn.class).name());
-                    }
-                } else {
-                    sheet.setColumnWidth(cellIndex, field.getAnnotation(ExcelColumn.class).width() * 256);
-                    cell = xRow.createCell(cellIndex++);
-                    cell.setCellStyle(titleStyle);
-                    cell.setCellValue(field.getAnnotation(ExcelColumn.class).name());
-                }
-            }
-            if (CollectionUtils.isNotEmpty((Collection) dataList)) {
-                try {
-                    for (final Object vo : dataList) {
-                        xRow = sheet.createRow(rowIndex++);
-                        cellIndex = 0;
-                        for (final Field field2 : expFields) {
-                            Object fieldVal;
-                            if (expCustTextFields.get(field2) != null) {
-                                try {
-                                    fieldVal = expCustTextFields.get(field2).invoke(vo, new Object[0]);
-                                } catch (Exception e3) {
-                                    fieldVal = "";
-                                }
-                            } else {
-                                fieldVal = field2.get(vo);
-                            }
-                            if (field2.getAnnotation(ExcelColumn.class).isJavaBean()) {
-                                for (final Field subField2 : getClassExportFields(field2.getType())) {
-                                    cell = xRow.createCell(cellIndex++);
-                                    cell.setCellStyle(cellStyle);
-                                    final Object subFieldValue = subField2.get(fieldVal);
-                                    if (isNumberType(subField2.getType()) && (subFieldValue == null || subFieldValue instanceof Number)) {
-                                        cell.setCellType(0);
-                                        cell.setCellValue((double) getNumberValue(subFieldValue));
-                                    } else {
-                                        cell.setCellValue(getStringValue(subFieldValue));
-                                    }
-                                }
-                            } else {
-                                cell = xRow.createCell(cellIndex++);
-                                cell.setCellStyle(cellStyle);
-                                if (isNumberType(field2.getType()) && (fieldVal == null || fieldVal instanceof Number)) {
-                                    cell.setCellType(0);
-                                    final double value = getNumberValue(fieldVal);
-                                    cell.setCellValue((double) getNumberValue(fieldVal));
-                                    if (!field2.getAnnotation(ExcelColumn.class).haveColor()) {
-                                        continue;
-                                    }
-                                    final CellStyle style = workBook.createCellStyle();
-                                    style.cloneStyleFrom(cellStyle);
-                                    final Font f = workBook.createFont();
-                                    if (value < 0.0) {
-                                        f.setColor((short) 10);
-                                        style.setFont(f);
-                                    } else if (value > 0.0) {
-                                        f.setColor((short) 17);
-                                        style.setFont(f);
-                                    }
-                                    cell.setCellStyle(style);
-                                } else {
-                                    cell.setCellValue(getStringValue(fieldVal));
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    sheet.createRow(rowIndex++).createCell(0).setCellValue(e.toString());
-                    LogUtil.error(e.toString());
-                }
-            }
-        } catch (Exception e2) {
-            LogUtil.error(e2.toString());
-        }
     }
 
     private static boolean isNumberType(final Class clazz) {
@@ -575,7 +390,6 @@ public class Export {
     }
 
     static {
-        logger = Logger.getLogger((Class) Export.class);
         exportFieldsCache = new HashMap<Class<?>, List<Field>>(128);
         exportCustTextFields = new HashMap<Class<?>, Map<Field, Method>>(128);
     }

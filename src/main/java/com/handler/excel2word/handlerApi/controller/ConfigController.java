@@ -27,28 +27,28 @@ public class ConfigController {
     }
 
     @PutMapping("/update/{id}")
-    public Config update(@PathVariable Long id, @RequestBody Config req) {
+    public Config update(@PathVariable("id") Long id, @RequestBody Config req) {
         return service.update(id, req);
     }
 
     @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable("id") Long id) {
         service.delete(id);
         return "Deleted";
     }
 
     @GetMapping("/{id}")
-    public Config getOne(@PathVariable Long id) {
+    public Config getOne(@PathVariable("id") Long id) {
         return service.findById(id);
     }
 
     @GetMapping("/key/{key}")
-    public Config getByKey(@PathVariable String key) {
+    public Config getByKey(@PathVariable("key") String key) {
         return service.findByKey(key);
     }
 
     @GetMapping("/name/{name}")
-    public List<Config> getByName(@PathVariable String name) {
+    public List<Config> getByName(@PathVariable("name") String name) {
         return service.findByName(name);
     }
 
@@ -58,7 +58,7 @@ public class ConfigController {
     }
 
     @GetMapping("/authGoogle")
-    public Config authGoogle(@RequestParam String code) {
+    public String authGoogle(@RequestParam String code) {
         // Implement Google Authenticator logic here
         return service.authGoogle(code);
     }

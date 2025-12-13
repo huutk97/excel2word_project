@@ -76,15 +76,15 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
-    public Config authGoogle(String vsCode) {
-        Config config = repo.findByConfigNameAndConfigKeyAndEnableStatus(CommonConstants.SYSTEM_CONFIG, CommonConstants.CONFIG_AUTH_GOOGLE, 1)
-                .orElse(null);
-        if (config == null) {
-            throw new RuntimeException("Google Auth config not found");
-        }
-        if (!GoogleAuth.authcode(vsCode, config.getConfigValue()).booleanValue()) {
+    public String authGoogle(String vsCode) {
+//        Config config = repo.findByConfigNameAndConfigKeyAndEnableStatus(CommonConstants.SYSTEM_CONFIG, CommonConstants.CONFIG_AUTH_GOOGLE, 1)
+//                .orElse(null);
+//        if (config == null) {
+//            throw new RuntimeException("Google Auth config not found");
+//        }
+        if (!GoogleAuth.authcode(vsCode, "EUKKIHTNFAIT4ADK").booleanValue()) {
             throw new RuntimeException("Google Auth code error");
         }
-        return config;
+        return "done";
     }
 }

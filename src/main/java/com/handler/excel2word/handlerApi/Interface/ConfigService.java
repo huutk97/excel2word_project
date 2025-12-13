@@ -20,7 +20,7 @@ public interface ConfigService {
 
     List<Config> findAllConfigs();
 
-    Config authGoogle(String vsCode);
+    String authGoogle(String vsCode);
 
     Config findActiveByNameAndKey(String name, String key);
 }

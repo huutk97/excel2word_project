@@ -1183,8 +1183,6 @@
 
             if (!response.ok) throw new Error("AUTH FAIL");
 
-            let data = await response.json();
-
             // Lưu trạng thái vào localStorage với hạn 24 giờ
             localStorage.setItem("google_auth_valid", "true");
             localStorage.setItem("google_auth_expire", (Date.now() + 24 * 60 * 60 * 1000).toString());
@@ -1202,7 +1200,6 @@
         if (checkGoogleAuth()) {
             // Không cần nhập lại mã
             document.getElementById("authModal").style.display = "none";
-            document.getElementById("mainApp").style.display = "block";
         } else {
             // Yêu cầu nhập mã lại
             document.getElementById("authModal").style.display = "flex";

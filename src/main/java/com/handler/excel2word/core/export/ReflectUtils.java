@@ -137,7 +137,7 @@ public class ReflectUtils {
     }
 
     public static List<Field> getClassAndSuperClassFields(Class<?> clazz) {
-        Assert.notNull(clazz);
+        org.springframework.util.Assert.notNull(clazz, "clazz must not be null");
         List<Field> result = (List)declaredFieldsCache.get(clazz);
         if (result == null) {
             if (clazz.getSuperclass() == Object.class) {

@@ -1,6 +1,7 @@
 package com.handler.excel2word.core.utils;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.text.WordUtils;
 
 import java.util.ArrayList;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
 
 public class StringUtil {
     private static String string = "abcdefghijklmnopqrstuvwxyz";

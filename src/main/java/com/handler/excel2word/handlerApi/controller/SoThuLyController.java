@@ -6,6 +6,7 @@ import com.handler.excel2word.dto.SoThuLyKiemSoatDTO;
 import com.handler.excel2word.handlerApi.entity.SoThuLyKiemSoat;
 import com.handler.excel2word.handlerApi.Interface.SoThuLyService;
 import com.handler.excel2word.handlerApi.dto.SoThuLyDTO;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
 import org.docx4j.model.structure.PageSizePaper;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
@@ -54,7 +54,7 @@ public class SoThuLyController {
     }
 
     @GetMapping("/{id}")
-    public SoThuLyKiemSoat getById(@PathVariable Long id) {
+    public SoThuLyKiemSoat getById(@PathVariable("id") Long id) {
         return service.getById(id);
     }
 
@@ -81,8 +81,8 @@ public class SoThuLyController {
     }
 
     @GetMapping("search")
-    public Page<SoThuLyKiemSoat> searchJson(SoThuLyDTO dto, @RequestParam(defaultValue = "0") int page,
-                                                    @RequestParam(defaultValue = "10") int size) {
+    public Page<SoThuLyKiemSoat> searchJson(SoThuLyDTO dto, @RequestParam(name = "page",defaultValue = "0") int page,
+                                                    @RequestParam(name = "size",defaultValue = "10") int size) {
         return service.queryPage(dto, page, size);
     }
 
@@ -93,7 +93,7 @@ public class SoThuLyController {
     }
 
     @GetMapping("/download-doc/{id}")
-    public ResponseEntity<InputStreamResource> downloadDocx(@PathVariable Long id) throws Exception {
+    public ResponseEntity<InputStreamResource> downloadDocx(@PathVariable(name = "id") Long id) throws Exception {
         if (id == null) throw new IllegalArgumentException("ID không được để trống");
 
         SoThuLyDTO lyKiemSoat = service.findById(id);

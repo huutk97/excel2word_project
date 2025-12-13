@@ -19,7 +19,7 @@ public class SoThuLyViewController {
     private final SoThuLyService service;
 
     @GetMapping
-    public String viewList(Model model, @RequestParam(defaultValue = "0") int page) {
+    public String viewList(Model model, @RequestParam(name = "page", defaultValue = "0") int page) {
         SoThuLyDTO soThuLyDTO = new SoThuLyDTO();
         Page<SoThuLyKiemSoat> list = service.queryPage(soThuLyDTO, 0, 10);
         model.addAttribute("list", list.getContent());
