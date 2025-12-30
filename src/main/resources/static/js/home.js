@@ -18,8 +18,13 @@ $.ajaxSetup({
 let payload;
 try {
     payload = JSON.parse(atob(token.split(".")[1]));
+    if (isExpired(payload)) logout();
 } catch (e) {
     logout();
+}
+
+function isExpired(payload) {
+    return payload.exp && payload.exp < Date.now() / 1000;
 }
 
 const roles = payload.authorities || payload.roles || [];
