@@ -32,8 +32,11 @@
       vertical-align: top;
     }
     .vien-ksnd-cap {
+      display: block;
       border-bottom: 2px solid black;
       text-underline-offset: 6px;
+      font-size: 12pt !important;
+      text-align: center;
     }
   </style>
 </head>
@@ -43,13 +46,13 @@
     <tbody>
     <tr>
       <td style="width:42%; text-align:center">
-        <p style="font-size: 12pt !important;">VIỆN KSND TỈNH <span th:text="${#strings.toUpperCase(ly.khuVuc)}"></span></p>
-        <p style="font-size: 12pt !important;"><u><strong><span class="vien-ksnd-cap" th:text="${#strings.toUpperCase(ly.vienKsndCap)}"></span></strong></u></p>
-        <p style="font-size: 12pt !important;"><strong>Số: [[${ly.orderNumber}]]/<span th:text="${#strings.toUpperCase(ly.maPhieu)}"></span></strong></p>
+        <span style="font-size: 12pt !important; display: block;text-align: center;">VKSND TỈNH <span style="font-size: 12pt !important;" th:text="${#strings.toUpperCase(ly.khuVuc)}"></span></span>
+        <span class="vien-ksnd-cap"><strong>[[${#strings.toUpperCase(ly.vienKsndCap)}]]</strong></span>
+        <p style="font-size: 12pt !important;">Số: [[${ly.orderNumber}]]/<span th:text="${#strings.toUpperCase(ly.maPhieu)}"></span></p>
       </td>
       <td style="width:58%; text-align:center;">
         <p style="font-size: 12pt !important;"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></p>
-        <p><u><strong style="font-weight:bold;">Độc lập - Tự do - Hạnh phúc</strong></u></p>
+        <span><u><strong style="font-weight:bold;">Độc lập - Tự do - Hạnh phúc</strong></u></span>
         <p><em>[[${T(com.handler.excel2word.core.utils.StringUtil).capitalizeFully(ly.khuVuc)}]], ngày [[${ly.ngayTL}]] tháng [[${ly.thangTL}]] năm [[${ly.namTL}]]</em></p>
       </td>
     </tr>
@@ -92,7 +95,7 @@
     <tbody>
     <tr>
       <td style="width:50%; text-align:center;">
-        <p><strong>KT. VIỆN TRƯỞNG</strong></p>
+        <p style="font-size: 13pt !important;">KT. VIỆN TRƯỞNG</p>
         <p><strong>PHÓ VIỆN TRƯỞNG</strong></p>
         <p style="text-align:center;"></p>
         <p style="text-align:center;"><br></p>
