@@ -21,7 +21,7 @@ public class ConfigController {
     }
 
     @GetMapping("/active")
-    public Config getActiveConfig(@RequestParam String name, @RequestParam String key
+    public Config getActiveConfig(@RequestParam(name = "name", required = true)  String name, @RequestParam(name = "key", required = true) String key
     ) {
         return service.findActiveByNameAndKey(name, key);
     }
@@ -58,7 +58,7 @@ public class ConfigController {
     }
 
     @GetMapping("/authGoogle")
-    public String authGoogle(@RequestParam String code) {
+    public String authGoogle(@RequestParam(name = "code", required = true) String code) {
         // Implement Google Authenticator logic here
         return service.authGoogle(code);
     }
